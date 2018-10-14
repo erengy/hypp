@@ -1,0 +1,97 @@
+#pragma once
+
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include <hypp/detail/uri.hpp>
+#include <hypp/detail/util.hpp>
+
+namespace hypp {
+
+class Uri {
+public:
+  constexpr Uri() = default;
+
+  class Authority {
+  public:
+    constexpr Authority() = default;
+
+    // authority = [ userinfo "@" ] host [ ":" port ]
+    std::string to_string() const {
+      std::string authority;
+      if (!user_info.empty()) {
+        // @TODO:
+        // > A sender MUST NOT generate the userinfo subcomponent (and its "@"
+        // delimiter) when an "http" URI reference is generated within a message
+        // as a request target or header field value.
+        // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
+        authority += detail::util::concat(user_info, '@');
+      }
+      authority += host;
+      if (!port.empty()) {
+        authority += detail::util::concat(':', port);
+      }
+      return authority;
+    }
+
+    std::string user_info;
+    std::string host;
+    std::string port;
+  };
+
+  class Query {
+  public:
+    constexpr Query() = default;
+
+    struct Parameter {
+      std::string key;
+      std::string value;
+    };
+
+    std::string to_string() const {
+      std::string query;
+      for (const auto& param : parameters) {
+        if (!query.empty()) {
+          query.push_back('&');
+        }
+        query += detail::util::concat(
+            param.key, '=', detail::uri::encode(param.value));
+      }
+      return query;
+    }
+
+    std::vector<Parameter> parameters;
+  };
+
+  virtual std::string to_string() const {
+    // > A sender MUST NOT generate an "http" URI with an empty host identifier.
+    // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
+    if (authority.host.empty()) {
+      return {};
+    }
+
+    // http-URI = "http:" "//" authority path-abempty [ "?" query ]
+    //            [ "#" fragment ]
+    std::string uri;
+    if (!scheme.empty()) {
+      uri += detail::util::concat(scheme, "://");
+    }
+    uri += detail::util::concat(authority.to_string(), path);
+    if (!query.parameters.empty()) {
+      uri += detail::util::concat('?', query.to_string());
+    }
+    if (!fragment.empty()) {
+      uri += detail::util::concat('#', fragment);
+    }
+    return uri;
+  }
+
+  std::string scheme;
+  Authority authority;
+  std::string path;
+  Query query;
+  std::string fragment;
+};
+
+}  // namespace hypp
