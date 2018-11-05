@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -43,31 +44,41 @@ public:
   virtual std::string to_string() const {
     // > A sender MUST NOT generate an "http" URI with an empty host identifier.
     // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
-    if (authority.host.empty()) {
+    if (authority.has_value() && authority->host.empty()) {
       return {};
     }
+
+    // > Note that we are careful to preserve the distinction between a
+    // component that is undefined, meaning that its separator was not present
+    // in the reference, and a component that is empty, meaning that the
+    // separator was present and was immediately followed by the next component
+    // separator or the end of the reference.
+    // Reference: https://tools.ietf.org/html/rfc3986#section-5.3
 
     // http-URI = "http:" "//" authority path-abempty [ "?" query ]
     //            [ "#" fragment ]
     std::string uri;
-    if (!scheme.empty()) {
-      uri += detail::util::concat(scheme, "://");
+    if (scheme.has_value()) {
+      uri += detail::util::concat(*scheme, ':');
     }
-    uri += detail::util::concat(authority.to_string(), path);
-    if (!query.empty()) {
-      uri += detail::util::concat('?', query);
+    if (authority.has_value()) {
+      uri += detail::util::concat("//", authority->to_string());
     }
-    if (!fragment.empty()) {
-      uri += detail::util::concat('#', fragment);
+    uri += path;
+    if (query.has_value()) {
+      uri += detail::util::concat('?', *query);
+    }
+    if (fragment.has_value()) {
+      uri += detail::util::concat('#', *fragment);
     }
     return uri;
   }
 
-  std::string scheme;
-  Authority authority;
+  std::optional<std::string> scheme;
+  std::optional<Authority> authority;
   std::string path;
-  std::string query;
-  std::string fragment;
+  std::optional<std::string> query;
+  std::optional<std::string> fragment;
 };
 
 }  // namespace hypp
