@@ -40,30 +40,6 @@ public:
     std::string port;
   };
 
-  class Query {
-  public:
-    constexpr Query() = default;
-
-    struct Parameter {
-      std::string key;
-      std::string value;
-    };
-
-    std::string to_string() const {
-      std::string query;
-      for (const auto& param : parameters) {
-        if (!query.empty()) {
-          query.push_back('&');
-        }
-        query += detail::util::concat(
-            param.key, '=', detail::uri::encode(param.value));
-      }
-      return query;
-    }
-
-    std::vector<Parameter> parameters;
-  };
-
   virtual std::string to_string() const {
     // > A sender MUST NOT generate an "http" URI with an empty host identifier.
     // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
@@ -78,8 +54,8 @@ public:
       uri += detail::util::concat(scheme, "://");
     }
     uri += detail::util::concat(authority.to_string(), path);
-    if (!query.parameters.empty()) {
-      uri += detail::util::concat('?', query.to_string());
+    if (!query.empty()) {
+      uri += detail::util::concat('?', query);
     }
     if (!fragment.empty()) {
       uri += detail::util::concat('#', fragment);
@@ -90,7 +66,7 @@ public:
   std::string scheme;
   Authority authority;
   std::string path;
-  Query query;
+  std::string query;
   std::string fragment;
 };
 
