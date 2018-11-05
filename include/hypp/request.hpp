@@ -27,13 +27,13 @@ public:
     switch (form) {
       // origin-form = absolute-path [ "?" query ]
       case Form::Origin:
+      default:
         return uri.query.has_value() ?
             detail::util::concat(uri.path, '?', *uri.query) :
             uri.path;
 
       // absolute-form = absolute-URI
       case Form::Absolute:
-      default:
         return uri.to_string();
 
       // authority-form = authority
@@ -47,7 +47,9 @@ public:
     }
   }
 
-  Form form = Form::Absolute;
+  // > The most common form of request-target is the origin-form.
+  // Reference: https://tools.ietf.org/html/rfc7230#section-5.3.1
+  Form form = Form::Origin;
   Uri uri;
 };
 
