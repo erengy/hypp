@@ -41,7 +41,7 @@ public:
     std::string port;
   };
 
-  virtual std::string to_string() const {
+  std::string to_string() const {
     // > A sender MUST NOT generate an "http" URI with an empty host identifier.
     // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
     if (authority.has_value() && authority->host.empty()) {

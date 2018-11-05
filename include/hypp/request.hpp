@@ -11,7 +11,7 @@
 
 namespace hypp {
 
-class RequestTarget : public Uri {
+class RequestTarget {
 public:
   constexpr RequestTarget() = default;
 
@@ -23,12 +23,32 @@ public:
     Asterisk,   // e.g. "OPTIONS * HTTP/1.1"
   };
 
-  std::string to_string() const override {
-    // @TODO: switch (form)
-    return Uri::to_string();
+  std::string to_string() const {
+    switch (form) {
+      // origin-form = absolute-path [ "?" query ]
+      case Form::Origin:
+        return uri.query.has_value() ?
+            detail::util::concat(uri.path, '?', *uri.query) :
+            uri.path;
+
+      // absolute-form = absolute-URI
+      case Form::Absolute:
+      default:
+        return uri.to_string();
+
+      // authority-form = authority
+      case Form::Authority:
+        return uri.authority.has_value() ?
+            uri.authority->to_string() : std::string{};
+
+      // asterisk-form = "*"
+      case Form::Asterisk:
+        return "*";
+    }
   }
 
   Form form = Form::Absolute;
+  Uri uri;
 };
 
 class RequestLine {
