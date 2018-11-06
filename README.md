@@ -10,7 +10,6 @@ hypp aims to conform to the syntax and semantics of HTTP/1.1 elements according 
 
 - [RFC 3986](https://tools.ietf.org/html/rfc3986) - Uniform Resource Identifier (URI): Generic Syntax
 - [RFC 5234](https://tools.ietf.org/html/rfc5234) - Augmented BNF for Syntax Specifications: ABNF
-- [RFC 5789](https://tools.ietf.org/html/rfc5789) - PATCH Method for HTTP
 - [RFC 7230](https://tools.ietf.org/html/rfc7230) - Hypertext Transfer Protocol (HTTP/1.1): Message Syntax and Routing
 - [RFC 7231](https://tools.ietf.org/html/rfc7231) - Hypertext Transfer Protocol (HTTP/1.1): Semantics and Content
 
