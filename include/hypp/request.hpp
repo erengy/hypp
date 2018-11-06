@@ -26,11 +26,15 @@ public:
   std::string to_string() const {
     switch (form) {
       // origin-form = absolute-path [ "?" query ]
-      case Form::Origin:
       default:
+      case Form::Origin: {
+        // > If the target URI's path component is empty, the client MUST send
+        // "/" as the path within the origin-form of request-target.
+        // Reference: https://tools.ietf.org/html/rfc7230#section-5.3.1
+        const std::string path = !uri.path.empty() ? uri.path : "/";
         return uri.query.has_value() ?
-            detail::util::concat(uri.path, '?', *uri.query) :
-            uri.path;
+            detail::util::concat(path, '?', *uri.query) : path;
+      }
 
       // absolute-form = absolute-URI
       case Form::Absolute:
