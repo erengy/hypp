@@ -27,18 +27,18 @@ public:
         // delimiter) when an "http" URI reference is generated within a message
         // as a request target or header field value.
         // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
-        authority += detail::util::concat(user_info, '@');
+        authority += detail::util::concat(*user_info, '@');
       }
       authority += host;
-      if (!port.empty()) {
-        authority += detail::util::concat(':', port);
+      if (port.has_value()) {
+        authority += detail::util::concat(':', *port);
       }
       return authority;
     }
 
-    std::string user_info;
+    std::optional<std::string> user_info;
     std::string host;
-    std::string port;
+    std::optional<std::string> port;
   };
 
   std::string to_string() const {
