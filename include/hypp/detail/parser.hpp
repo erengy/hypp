@@ -8,9 +8,11 @@ namespace hypp::detail {
 
 class Parser {
 public:
-  using pred_t = std::function<bool(const char)>;
-  using size_t = std::string_view::size_type;
   using view_t = std::string_view;
+  using size_t = view_t::size_type;
+
+  using pred_t = std::function<bool(const char)>;
+  using func_t = std::function<size_t(const view_t)>;
 
   constexpr Parser(const view_t v) : v_{v} {}
 
@@ -30,69 +32,72 @@ public:
   bool Peek(const pred_t p) const {
     return !v_.empty() && p(v_.front());
   }
-  bool Peek(size_t count, const pred_t p) const {
-    const auto s = v_.substr(0, std::min(count, v_.size()));
-    return s.empty() && std::all_of(s.begin(), s.end(), p);
+  size_t Peek(const func_t f) const {
+    return !v_.empty() ? f(v_) : size_t{0};
+  }
+
+  size_t Count(size_t count, const pred_t p) const {
+    count = std::min(count, v_.size());
+    const auto it = std::find_if_not(v_.begin(), v_.begin() + count, p);
+    return std::distance(v_.begin(), it);
+  }
+  size_t Count(size_t count, const func_t f) const {
+    view_t v{v_.substr(0, count)};
+    while (!v.empty() && (count = f(v))) {
+      v.remove_prefix(count);
+    }
+    return v_.size() - v.size();
   }
 
   char Match(const pred_t p) {
-    if (!v_.empty()) {
-      const char c = v_.front();
-      if (p(c)) {
-        v_.remove_prefix(1);
-        return c;
-      }
-    }
-    return '\0';
+    return Peek(p) ? Read() : '\0';
+  }
+  view_t Match(const func_t f) {
+    return Read(Peek(f));
   }
   view_t Match(const size_t count, const pred_t p) {
-    const auto s = v_.substr(0, std::min(count, v_.size()));
-    if (!s.empty()) {
-      const auto it = std::find_if_not(s.begin(), s.end(), p);
-      const auto size = std::distance(s.begin(), it);
-      const view_t r{s.substr(0, size)};
-      v_.remove_prefix(size);
-      return r;
-    }
-    return {};
+    return Read(Count(count, p));
+  }
+  view_t Match(const size_t count, const func_t f) {
+    return Read(Count(count, f));
+  }
+  view_t Match(const size_t count, const pred_t p, const func_t f) {
+    const auto f_both = [&](const view_t v) {
+      return p(v.front()) ? size_t{1} : f(v);
+    };
+    return Read(Count(count, f_both));
   }
 
+  constexpr char Read() {
+    const char c = !v_.empty() ? v_.front() : '\0';
+    v_.remove_prefix(c ? 1 : 0);
+    return c;
+  }
+  constexpr view_t Read(const size_t count) {
+    const view_t s = v_.substr(0, count);
+    v_.remove_prefix(s.size());
+    return s;
+  }
   constexpr view_t ReadAll() {
-    const view_t v{v_};
-    v_.remove_prefix(v_.size());
-    return v;
+    return Read(v_.size());
+  }
+
+  constexpr bool Remove(const size_t count) {
+    const size_t rcount = std::min(count, v_.size());
+    v_.remove_prefix(rcount);
+    return count && count == rcount;
   }
 
   constexpr bool Skip(const char c) {
-    if (Peek(c)) {
-      v_.remove_prefix(1);
-      return true;
-    }
-    return false;
+    return Peek(c) && Remove(size_t{1});
   }
   constexpr bool Skip(const view_t s) {
-    if (Peek(s)) {
-      v_.remove_prefix(s.size());
-      return true;
-    }
-    return false;
+    return Peek(s) && Remove(s.size());
   }
 
-  constexpr bool Strip(const char c) {
-    const auto pos = v_.find_first_not_of(c);
-    if (pos != view_t::npos && pos > 0) {
-      v_.remove_prefix(pos);
-      return true;
-    }
-    return false;
-  }
   constexpr bool Strip(const view_t s) {
     const auto pos = v_.find_first_not_of(s);
-    if (pos != view_t::npos && pos > 0) {
-      v_.remove_prefix(pos);
-      return true;
-    }
-    return false;
+    return pos != view_t::npos && Remove(pos);
   }
 
 private:
