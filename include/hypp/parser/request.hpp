@@ -6,7 +6,7 @@
 #include <hypp/parser/message.hpp>
 #include <hypp/parser/method.hpp>
 #include <hypp/parser/syntax.hpp>
-//#include <hypp/parser/uri.hpp>
+#include <hypp/parser/uri.hpp>
 #include <hypp/parser/version.hpp>
 #include <hypp/request.hpp>
 
@@ -31,17 +31,12 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
     return Unexpected{Error::Bad_Request};
   }
 
-  // @TODO
   // request-target SP
-  /*
   if (const auto expected = ParseUri(parser)) {
     request_line.target = expected.value();
   } else {
     return Unexpected{expected.error()};
   }
-  */
-  parser.Match(limits::kMaxLimit,
-               [](const char c) { return c != syntax::kSP; });
   if (!parser.Skip(syntax::kSP)) {
     return Unexpected{Error::Bad_Request};
   }

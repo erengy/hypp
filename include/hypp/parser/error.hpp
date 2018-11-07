@@ -32,8 +32,11 @@ enum class Error {
   Invalid_Status_Code,
 
   // URI
+  Address_Mechanism_Not_Supported,
   Invalid_URI,
   Invalid_URI_Scheme,
+  Invalid_URI_Host,
+  Invalid_URI_Path,
 
   // HTTP version
   Invalid_HTTP_Name,

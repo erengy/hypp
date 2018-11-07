@@ -6,7 +6,7 @@
 #include <hypp/parser/request.hpp>
 #include <hypp/parser/response.hpp>
 #include <hypp/parser/status.hpp>
-//#include <hypp/parser/uri.hpp>
+#include <hypp/parser/uri.hpp>
 #include <hypp/parser/version.hpp>
 
 #include <hypp/header.hpp>
