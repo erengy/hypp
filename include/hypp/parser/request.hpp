@@ -12,6 +12,50 @@
 
 namespace hypp::parser {
 
+Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
+  RequestTarget request_target;
+
+  // origin-form = absolute-path [ "?" query ]
+  if (parser.Peek('/')) {
+    request_target.form = RequestTarget::Form::Origin;
+    if (const auto expected = ParseUriPath(parser, syntax::kAbsolutePath)) {
+      request_target.uri.path = expected.value();
+    } else {
+      return Unexpected{Error::Invalid_Request_Target};
+    }
+    if (parser.Skip('?')) {
+      if (const auto expected = ParseUriQuery(parser)) {
+        request_target.uri.query = expected.value();
+      } else {
+        return Unexpected{Error::Invalid_Request_Target};
+      }
+    }
+    return request_target;
+  }
+
+  // absolute-form = absolute-URI
+  if (const auto expected = ParseAbsoluteUri(parser)) {
+    request_target.form = RequestTarget::Form::Absolute;
+    request_target.uri = expected.value();
+    return request_target;
+  }
+
+  // asterisk-form = "*"
+  if (parser.Skip('*')) {
+    request_target.form = RequestTarget::Form::Asterisk;
+    return request_target;
+  }
+
+  // authority-form = authority
+  if (const auto expected = ParseUriAuthority(parser)) {
+    request_target.form = RequestTarget::Form::Authority;
+    request_target.uri.authority = expected.value();
+    return request_target;
+  }
+
+  return Unexpected{Error::Invalid_Request_Target};
+}
+
 Expected<RequestLine> ParseRequestLine(Parser& parser) {
   RequestLine request_line;
 
@@ -32,7 +76,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   }
 
   // request-target SP
-  if (const auto expected = ParseUri(parser)) {
+  if (const auto expected = ParseRequestTarget(parser)) {
     request_line.target = expected.value();
   } else {
     return Unexpected{expected.error()};

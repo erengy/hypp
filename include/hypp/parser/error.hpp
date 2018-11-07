@@ -25,6 +25,9 @@ enum class Error {
   // Method
   Invalid_Method,
 
+  // Request
+  Invalid_Request_Target,
+
   // Response
   Bad_Response,
 
