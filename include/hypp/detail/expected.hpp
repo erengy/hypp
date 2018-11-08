@@ -49,10 +49,12 @@ public:
       : value_{std::move(unexpected)} {}
 
   constexpr bool operator==(const expected_t& rhs) const {
-    return value() == rhs.value();
+    if (has_value() != rhs.has_value()) return false;
+    return has_value() ? value() == rhs.value() : error() == rhs.error();
   }
   constexpr bool operator!=(const expected_t& rhs) const {
-    return value() != rhs.value();
+    if (has_value() != rhs.has_value()) return true;
+    return has_value() ? value() != rhs.value() : error() != rhs.error();
   }
 
   constexpr explicit operator bool() const {
