@@ -9,7 +9,6 @@ namespace hypp::parser {
 
 enum class Error {
   // HTTP status codes
-  OK,                               // 200
   Bad_Request,                      // 400
   Payload_Too_Large,                // 413
   URI_Too_Long,                     // 414

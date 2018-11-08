@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
@@ -10,7 +12,8 @@ namespace hypp::parser {
 
 namespace detail {
 
-constexpr Error VerifyHttpVersion(const char major, const char minor) {
+constexpr std::optional<Error> VerifyHttpVersion(const char major,
+                                                 const char minor) {
   // HTTP/0.9 messages do not indicate the protocol version. Higher major
   // versions of the protocol (e.g. HTTP/2.0) would have an incompatible
   // messaging syntax.
@@ -41,7 +44,7 @@ constexpr Error VerifyHttpVersion(const char major, const char minor) {
   // version to which the recipient is conformant.
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.6
 
-  return Error::OK;
+  return std::nullopt;
 }
 
 }  // namespace detail
@@ -72,9 +75,8 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
 
-  const auto error = detail::VerifyHttpVersion(major, minor);
-  if (error != Error::OK) {
-    return Unexpected{error};
+  if (const auto error = detail::VerifyHttpVersion(major, minor)) {
+    return Unexpected{*error};
   }
 
   return HttpVersion{major, minor};

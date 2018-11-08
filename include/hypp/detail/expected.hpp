@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <utility>
 
 namespace hypp::detail {
@@ -29,19 +30,19 @@ private:
   E value_;
 };
 
-template <typename T, typename E, E default_error>
+template <typename T, typename E>
 class Expected {
 public:
   using value_t = T;
   using error_t = E;
-  using expected_t = Expected<T, E, default_error>;
+  using expected_t = Expected<T, E>;
   using unexpected_t = Unexpected<E>;
 
   constexpr Expected() = delete;
   constexpr Expected(const value_t& value)
-      : value_{value}, unexpected_{default_error} {}
+      : value_{value} {}
   constexpr Expected(value_t&& value)
-      : value_{std::move(value)}, unexpected_{default_error} {}
+      : value_{std::move(value)} {}
   constexpr Expected(const unexpected_t& unexpected)
       : unexpected_{unexpected} {}
   constexpr Expected(unexpected_t&& unexpected)
@@ -55,14 +56,14 @@ public:
   }
 
   constexpr explicit operator bool() const {
-    return unexpected_.value() == default_error;
+    return !unexpected_.has_value();
   }
   constexpr bool has_value() const {
-    return unexpected_.value() == default_error;
+    return !unexpected_.has_value();
   }
 
   constexpr error_t error() const {
-    return unexpected_.value();
+    return unexpected_->value();
   }
 
   constexpr operator value_t() const {
@@ -77,7 +78,7 @@ public:
 
 private:
   value_t value_;
-  unexpected_t unexpected_;
+  std::optional<unexpected_t> unexpected_;
 };
 
 }  // namespace hypp::detail
