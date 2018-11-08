@@ -1,7 +1,7 @@
 #pragma once
 
-#include <optional>
 #include <utility>
+#include <variant>
 
 namespace hypp::detail {
 
@@ -11,7 +11,7 @@ namespace hypp::detail {
 template <typename E>
 class Unexpected {
 public:
-  Unexpected() = delete;
+  constexpr Unexpected() = delete;
   constexpr explicit Unexpected(const E& value) : value_{value} {}
   constexpr explicit Unexpected(E&& value) : value_{std::move(value)} {}
 
@@ -44,41 +44,37 @@ public:
   constexpr Expected(value_t&& value)
       : value_{std::move(value)} {}
   constexpr Expected(const unexpected_t& unexpected)
-      : unexpected_{unexpected} {}
+      : value_{unexpected} {}
   constexpr Expected(unexpected_t&& unexpected)
-      : unexpected_{std::move(unexpected)} {}
+      : value_{std::move(unexpected)} {}
 
   constexpr bool operator==(const expected_t& rhs) const {
-    return value_ == rhs.value();
+    return value() == rhs.value();
   }
   constexpr bool operator!=(const expected_t& rhs) const {
-    return value_ != rhs.value();
+    return value() != rhs.value();
   }
 
   constexpr explicit operator bool() const {
-    return !unexpected_.has_value();
+    return has_value();
   }
   constexpr bool has_value() const {
-    return !unexpected_.has_value();
+    return std::holds_alternative<value_t>(value_);
   }
 
   constexpr error_t error() const {
-    return unexpected_->value();
+    return std::get<unexpected_t>(value_).value();
   }
 
   constexpr operator value_t() const {
-    return value_;
+    return std::get<value_t>(value_);
   }
   constexpr const value_t& value() const {
-    return value_;
-  }
-  constexpr value_t& value() {
-    return value_;
+    return std::get<value_t>(value_);
   }
 
 private:
-  value_t value_;
-  std::optional<unexpected_t> unexpected_;
+  std::variant<value_t, unexpected_t> value_;
 };
 
 }  // namespace hypp::detail
