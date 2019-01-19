@@ -9,11 +9,45 @@
 
 namespace hypp::parser {
 
-Expected<Header::Field> ParseHeaderField(Parser& parser) {
+Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   // field-name = token
   const auto name = parser.Match(limits::kFieldName, syntax::IsTchar);
   if (name.empty()) {
     return Unexpected{Error::Invalid_Header_Name};
+  }
+  return name;
+}
+
+Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
+  // field-value   = *( field-content / obs-fold )
+  // field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
+  // field-vchar   = VCHAR / obs-text
+  //
+  // https://www.rfc-editor.org/errata/eid4189
+  // https://github.com/httpwg/http-core/issues/19
+  //
+  // Note that empty values are allowed.
+  return parser.Match(limits::kFieldValue,
+      [&parser](const char c) {
+        switch (c) {
+          default:
+            return syntax::IsVchar(c) || syntax::IsObsText(c);
+          case syntax::kSP:
+          case syntax::kHTAB:
+            return parser.Peek(syntax::IsVchar) ||
+                   parser.Peek(syntax::IsObsText);
+        }
+      });
+}
+
+Expected<Header::Field> ParseHeaderField(Parser& parser) {
+  Header::Field header_field;
+
+  // field-name
+  if (const auto expected = ParseHeaderFieldName(parser)) {
+    header_field.name = expected.value();
+  } else {
+    return Unexpected{expected.error()};
   }
 
   // > No whitespace is allowed between the header field-name and colon.
@@ -27,27 +61,17 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
   // OWS
   parser.Strip(syntax::kWhitespace);
 
-  // field-value   = *( field-content / obs-fold )
-  // field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
-  // field-vchar   = VCHAR / obs-text
-  const auto value = parser.Match(limits::kFieldValue,
-      [&parser](const char c) {
-        switch (c) {
-          default:
-            return syntax::IsVchar(c) || syntax::IsObsText(c);
-          case syntax::kSP:
-          case syntax::kHTAB:
-            return parser.Peek(syntax::IsVchar);
-        }
-      });
-  if (value.empty()) {
-    // Empty values are allowed
+  // field-value
+  if (const auto expected = ParseHeaderFieldValue(parser)) {
+    header_field.value = expected.value();
+  } else {
+    return Unexpected{expected.error()};
   }
 
   // OWS
   parser.Strip(syntax::kWhitespace);
 
-  return Header::Field{name, value};
+  return header_field;
 }
 
 Expected<Header> ParseHeaderFields(Parser& parser) {
