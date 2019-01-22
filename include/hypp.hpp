@@ -1,5 +1,12 @@
 #pragma once
 
+#include <hypp/generator/header.hpp>
+#include <hypp/generator/message.hpp>
+#include <hypp/generator/request.hpp>
+#include <hypp/generator/response.hpp>
+#include <hypp/generator/uri.hpp>
+#include <hypp/generator/version.hpp>
+
 #include <hypp/parser/header.hpp>
 #include <hypp/parser/message.hpp>
 #include <hypp/parser/method.hpp>
