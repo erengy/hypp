@@ -7,10 +7,7 @@
 namespace hypp {
 
 template <typename StartLine>
-class Message {
-public:
-  constexpr Message() = default;
-
+struct Message {
   StartLine start_line;  // start-line = request-line / status-line
   Header header;
   std::string body;

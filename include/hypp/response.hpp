@@ -8,17 +8,11 @@
 
 namespace hypp {
 
-class StatusLine {
-public:
-  constexpr StatusLine() = default;
-
+struct StatusLine {
   HttpVersion version;
   StatusCode code;
 };
 
-class Response : public Message<StatusLine> {
-public:
-  constexpr Response() = default;
-};
+using Response = Message<StatusLine>;
 
 }  // namespace hypp

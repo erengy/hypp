@@ -9,10 +9,7 @@
 
 namespace hypp {
 
-class RequestTarget {
-public:
-  constexpr RequestTarget() = default;
-
+struct RequestTarget {
   // Reference: https://tools.ietf.org/html/rfc7230#section-5.3
   enum class Form {
     Origin,     // e.g. "GET /where?q=now HTTP/1.1"
@@ -27,18 +24,12 @@ public:
   Uri uri;
 };
 
-class RequestLine {
-public:
-  constexpr RequestLine() = default;
-
+struct RequestLine {
   Method method;
   RequestTarget target;
   HttpVersion http_version;
 };
 
-class Request : public Message<RequestLine> {
-public:
-  constexpr Request() = default;
-};
+using Request = Message<RequestLine>;
 
 }  // namespace hypp

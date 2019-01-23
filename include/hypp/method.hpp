@@ -5,8 +5,7 @@
 
 namespace hypp {
 
-class Method {
-public:
+struct Method {
   constexpr Method() = default;
   constexpr Method(const std::string_view method) : method_{method} {}
 

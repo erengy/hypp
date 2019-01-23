@@ -5,14 +5,8 @@
 
 namespace hypp {
 
-class Uri {
-public:
-  constexpr Uri() = default;
-
-  class Authority {
-  public:
-    constexpr Authority() = default;
-
+struct Uri {
+  struct Authority {
     std::optional<std::string> user_info;
     std::string host;
     std::optional<std::string> port;
