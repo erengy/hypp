@@ -1,15 +1,16 @@
 #pragma once
 
+#include <string_view>
+
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
 #include <hypp/parser/limits.hpp>
 #include <hypp/parser/syntax.hpp>
-#include <hypp/method.hpp>
 
 namespace hypp::parser {
 
-Expected<Method> ParseMethod(Parser& parser) {
+Expected<std::string_view> ParseMethod(Parser& parser) {
   // method = token
   const auto view = parser.Match(limits::kMethod, syntax::IsTchar);
 
@@ -24,7 +25,7 @@ Expected<Method> ParseMethod(Parser& parser) {
     return Unexpected{Error::Not_Implemented};
   }
 
-  return Method{view};
+  return view;
 }
 
 }  // namespace hypp::parser

@@ -3,7 +3,6 @@
 #include <string>
 
 #include <hypp/message.hpp>
-#include <hypp/method.hpp>
 #include <hypp/uri.hpp>
 #include <hypp/version.hpp>
 
@@ -25,7 +24,7 @@ struct RequestTarget {
 };
 
 struct RequestLine {
-  Method method;
+  std::string method;
   RequestTarget target;
   HttpVersion http_version;
 };

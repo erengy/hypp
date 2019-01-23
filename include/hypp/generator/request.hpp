@@ -46,7 +46,7 @@ std::string to_string(const RequestTarget& target) {
 std::string to_string(const RequestLine& request_line) {
   using namespace parser::syntax;
   return detail::util::concat(
-      request_line.method.to_string(), kSP,
+      request_line.method, kSP,
       to_string(request_line.target), kSP,
       to_string(request_line.http_version), kCRLF);
 }
