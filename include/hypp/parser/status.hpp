@@ -18,7 +18,7 @@ Expected<status::code_t> ParseStatusCode(Parser& parser) {
     return Unexpected{Error::Invalid_Status_Code};
   }
 
-  return hypp::detail::util::to_int(view);
+  return hypp::detail::util::from_chars<status::code_t>(view);
 }
 
 Expected<std::string_view> ParseReasonPhrase(Parser& parser) {
