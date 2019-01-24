@@ -13,10 +13,11 @@ namespace hypp {
 template <typename StartLine>
 std::string to_string(const Message<StartLine>& message) {
   using namespace parser::syntax;
-  return detail::util::concat(to_string(message.start_line),
-                              to_string(message.header),
-                              kCRLF,
-                              message.body);
+  return detail::concat(
+      to_string(message.start_line),
+      to_string(message.header),
+      kCRLF,
+      message.body);
 }
 
 }  // namespace hypp

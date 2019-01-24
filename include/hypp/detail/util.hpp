@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-namespace hypp::detail::util {
+namespace hypp::detail {
 
 std::string operator+(std::string lhs, const std::string_view& rhs) {
   return lhs.append(rhs);
@@ -29,4 +29,4 @@ std::string to_chars(const T value) {
       std::string(str.data(), result.ptr - str.data()) : std::string{};
 }
 
-}  // namespace hypp::detail::util
+}  // namespace hypp::detail

@@ -127,7 +127,7 @@ size_t IsDecOctet(std::string_view view) {
   //           / "2" %x30-34 DIGIT  ; 200-249
   //           / "25" %x30-35       ; 250-255
   view = view.substr(0, 3);
-  const int value = hypp::detail::util::from_chars<int>(view);
+  const int value = hypp::detail::from_chars<int>(view);
   const auto it = std::find_if_not(view.begin(), view.end(), IsDigit);
   switch (std::distance(view.begin(), it)) {
     case 1: return 1;

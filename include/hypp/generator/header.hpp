@@ -15,7 +15,7 @@ std::string to_string(const Header::Field& field) {
   // improve readability, a sender SHOULD generate the optional whitespace
   // as a single SP.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3.2.3
-  return detail::util::concat(field.name, ':', kSP, field.value);
+  return detail::concat(field.name, ':', kSP, field.value);
 }
 
 // *( header-field CRLF )

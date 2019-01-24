@@ -24,7 +24,7 @@ std::string to_string(const RequestTarget& target) {
       // Reference: https://tools.ietf.org/html/rfc7230#section-5.3.1
       const std::string path = !target.uri.path.empty() ? target.uri.path : "/";
       return target.uri.query.has_value() ?
-          detail::util::concat(path, '?', *target.uri.query) : path;
+          detail::concat(path, '?', *target.uri.query) : path;
     }
 
     // absolute-form = absolute-URI
@@ -45,7 +45,7 @@ std::string to_string(const RequestTarget& target) {
 // request-line = method SP request-target SP HTTP-version CRLF
 std::string to_string(const RequestLine& request_line) {
   using namespace parser::syntax;
-  return detail::util::concat(
+  return detail::concat(
       request_line.method, kSP,
       to_string(request_line.target), kSP,
       to_string(request_line.http_version), kCRLF);

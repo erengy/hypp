@@ -11,8 +11,7 @@ namespace hypp {
 // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
 std::string to_string(const HttpVersion& version) {
   using namespace parser::syntax;
-  return detail::util::concat(
-      kHttpName, '/', version.major, '.', version.minor);
+  return detail::concat(kHttpName, '/', version.major, '.', version.minor);
 }
 
 }  // namespace hypp

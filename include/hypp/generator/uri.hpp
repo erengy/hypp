@@ -13,13 +13,13 @@ std::string to_string(const Uri::Authority& authority) {
   std::string output;
 
   if (authority.user_info.has_value()) {
-    output += detail::util::concat(*authority.user_info, '@');
+    output += detail::concat(*authority.user_info, '@');
   }
 
   output += authority.host;
 
   if (authority.port.has_value()) {
-    output += detail::util::concat(':', *authority.port);
+    output += detail::concat(':', *authority.port);
   }
 
   return output;
@@ -38,7 +38,7 @@ std::string to_string(const Uri& uri) {
   std::string output;
 
   if (uri.scheme.has_value()) {
-    output += detail::util::concat(*uri.scheme, ':');
+    output += detail::concat(*uri.scheme, ':');
   }
 
   if (uri.authority.has_value()) {
@@ -47,7 +47,7 @@ std::string to_string(const Uri& uri) {
     if (uri.authority->host.empty()) {
       return {};
     }
-    output += detail::util::concat("//", to_string(*uri.authority));
+    output += detail::concat("//", to_string(*uri.authority));
   }
 
   // > A path is always defined for a URI, though the defined path may be
@@ -56,11 +56,11 @@ std::string to_string(const Uri& uri) {
   output += uri.path;
 
   if (uri.query.has_value()) {
-    output += detail::util::concat('?', *uri.query);
+    output += detail::concat('?', *uri.query);
   }
 
   if (uri.fragment.has_value()) {
-    output += detail::util::concat('#', *uri.fragment);
+    output += detail::concat('#', *uri.fragment);
   }
 
   return output;
