@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hypp/detail/parser.hpp>
+#include <hypp/detail/util.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
 #include <hypp/parser/limits.hpp>
@@ -9,7 +10,7 @@
 
 namespace hypp::parser {
 
-Expected<StatusCode> ParseStatusCode(Parser& parser) {
+Expected<status::code_t> ParseStatusCode(Parser& parser) {
   // status-code = 3DIGIT
   const auto view = parser.Match(limits::kStatusCode, syntax::IsDigit);
 
@@ -17,7 +18,7 @@ Expected<StatusCode> ParseStatusCode(Parser& parser) {
     return Unexpected{Error::Invalid_Status_Code};
   }
 
-  return StatusCode{view};
+  return hypp::detail::util::to_int(view);
 }
 
 Expected<std::string_view> ParseReasonPhrase(Parser& parser) {

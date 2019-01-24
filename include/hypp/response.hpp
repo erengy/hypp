@@ -10,7 +10,7 @@ namespace hypp {
 
 struct StatusLine {
   HttpVersion version;
-  StatusCode code;
+  status::code_t code = status::Code::k200_OK;
 };
 
 using Response = Message<StatusLine>;

@@ -1,13 +1,9 @@
 #pragma once
 
 #include <limits>
-#include <string>
 #include <string_view>
 
-#include <hypp/detail/util.hpp>
-
-namespace hypp {
-namespace status {
+namespace hypp::status {
 
 // status-code = 3DIGIT
 using code_t = int;
@@ -168,32 +164,4 @@ constexpr const std::string_view GetPhrase(const code_t code) {
   }
 }
 
-}  // namespace status
-
-class StatusCode {
-public:
-  constexpr StatusCode() = default;
-  constexpr StatusCode(const status::Code code) : code_{code} {}
-  StatusCode(const std::string_view view) : code_{detail::util::to_int(view)} {}
-
-  constexpr operator status::code_t() const {
-    return code_;
-  }
-
-  constexpr status::Category category() const {
-    return status::GetCategory(code_);
-  }
-
-  std::string to_string() const {
-    return std::to_string(code_);
-  }
-
-  std::string_view phrase() const {
-    return status::GetPhrase(code_);
-  }
-
-private:
-  status::Code code_ = status::Code::k200_OK;
-};
-
-}  // namespace hypp
+}  // namespace hypp::status
