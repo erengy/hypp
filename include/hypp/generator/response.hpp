@@ -15,7 +15,7 @@ std::string to_string(const StatusLine& status_line) {
   using namespace parser::syntax;
   return detail::util::concat(
       to_string(status_line.version), kSP,
-      std::to_string(status_line.code), kSP,
+      to_string(status_line.code), kSP,
       status::GetPhrase(status_line.code), kCRLF);
 }
 
