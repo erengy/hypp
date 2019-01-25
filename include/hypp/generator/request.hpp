@@ -14,18 +14,33 @@ namespace hypp {
 //                / absolute-form
 //                / authority-form
 //                / asterisk-form
-std::string to_string(const RequestTarget& target) {
+std::string to_string(RequestTarget target) {
+  // > A sender MUST NOT generate the userinfo subcomponent (and its "@"
+  // delimiter) when an "http" URI reference is generated within a message
+  // as a request target or header field value.
+  // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
+  if (target.uri.authority.has_value()) {
+    target.uri.authority->user_info.reset();
+  }
+
+  // > The target URI excludes the reference's fragment component, if any,
+  // since fragment identifiers are reserved for client-side processing.
+  // Reference: https://tools.ietf.org/html/rfc7230#section-5.1
+  target.uri.fragment.reset();
+
   switch (target.form) {
     // origin-form = absolute-path [ "?" query ]
     default:
-    case RequestTarget::Form::Origin: {
+    case RequestTarget::Form::Origin:
       // > If the target URI's path component is empty, the client MUST send
       // "/" as the path within the origin-form of request-target.
       // Reference: https://tools.ietf.org/html/rfc7230#section-5.3.1
-      const std::string path = !target.uri.path.empty() ? target.uri.path : "/";
+      if (target.uri.path.empty()) {
+        target.uri.path = "/";
+      }
       return target.uri.query.has_value() ?
-          detail::concat(path, '?', *target.uri.query) : path;
-    }
+          detail::concat(target.uri.path, '?', *target.uri.query) :
+          target.uri.path;
 
     // absolute-form = absolute-URI
     case RequestTarget::Form::Absolute:
