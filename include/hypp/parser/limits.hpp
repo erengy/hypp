@@ -28,6 +28,11 @@ namespace hypp::parser::limits {
 // implementations will choose substantially higher limits.
 // Reference: https://tools.ietf.org/html/rfc7230#section-9.3
 
+// > Recipients ought to carefully limit the extent to which they process other
+// protocol elements, including (but not limited to) request methods, response
+// status phrases, header field-names, numeric values, and body chunks.
+// Reference: https://tools.ietf.org/html/rfc7230#section-9.3
+
 #define EXACTLY(x) (x)
 #define ARBITRARY(x) (x)
 
@@ -40,12 +45,12 @@ constexpr size_t kBody         = kMaxLimit;
 // Request line
 constexpr size_t kRequestLine  = kMaxLimit;
 constexpr size_t kHttpVersion  = EXACTLY(8);     // "HTTP/1.1"
-constexpr size_t kMethod       = ARBITRARY(16);  // "GET", "POST", etc.
+constexpr size_t kMethod       = ARBITRARY(64);  // "GET", "POST", "UPDATEREDIRECTREF", etc.
 
 // Status line
 constexpr size_t kStatusLine   = kMaxLimit;
 constexpr size_t kStatusCode   = EXACTLY(3);     // "200", "404", etc.
-constexpr size_t kReasonPhrase = ARBITRARY(64);  // "OK", "Bad Request", etc.
+constexpr size_t kReasonPhrase = ARBITRARY(64);  // "OK", "Bad Request", "Network Authentication Required", etc.
 
 // Header fields
 constexpr size_t kHeaderFields = kMaxLimit;
