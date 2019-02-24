@@ -1,9 +1,9 @@
 #pragma once
 
+#include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
-#include <hypp/parser/limits.hpp>
 #include <hypp/parser/syntax.hpp>
 #include <hypp/uri.hpp>
 
@@ -14,7 +14,7 @@ Expected<std::string_view> ParseUriScheme(Parser& parser) {
   if (!parser.Peek(syntax::IsAlpha)) {
     return Unexpected{Error::Invalid_URI_Scheme};
   }
-  return parser.Match(limits::kScheme,
+  return parser.Match(hypp::detail::limits::kScheme,
       [](const char c) {
         switch (c) {
           case '+': case '-': case '.':
@@ -29,7 +29,7 @@ Expected<std::string_view> ParseUriScheme(Parser& parser) {
 
 // userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
 Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
-  return parser.Match(limits::kURI,
+  return parser.Match(hypp::detail::limits::kURI,
       [](const char c) {
         switch (c) {
           case ':':
@@ -77,7 +77,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   //
   // h16         = 1*4HEXDIG
   //             ; 16 bits of address represented in hexadecimal
-  const auto view = parser.Match(limits::kURI,
+  const auto view = parser.Match(hypp::detail::limits::kURI,
       [](const char c) {
         // @TODO: Parse properly
         switch (c) {
@@ -119,7 +119,7 @@ Expected<std::string_view> ParseIpV4Address(Parser& parser) {
 
 // reg-name = *( unreserved / pct-encoded / sub-delims )
 Expected<std::string_view> ParseRegisteredName(Parser& parser) {
-  return parser.Match(limits::kURI,
+  return parser.Match(hypp::detail::limits::kURI,
       [](const char c) {
         return syntax::IsUnreserved(c) || syntax::IsSubDelim(c);
       },
@@ -158,7 +158,7 @@ Expected<std::string_view> ParseUriHost(Parser& parser) {
 
 // port = *DIGIT
 Expected<std::string_view> ParseUriPort(Parser& parser) {
-  return parser.Match(limits::kPort, syntax::IsDigit);
+  return parser.Match(hypp::detail::limits::kPort, syntax::IsDigit);
 }
 
 // authority = [ userinfo "@" ] host [ ":" port ]
@@ -209,11 +209,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
   //               ; non-zero-length segment without any colon ":"
   const auto parse_segment = [](Parser& parser) {
-    return parser.Match(limits::kURI, syntax::IsPchar);
+    return parser.Match(hypp::detail::limits::kURI, syntax::IsPchar);
   };
   const auto parse_segment_nz_nc = [](Parser& parser) {
     Parser segment_parser{parser};
-    auto view = segment_parser.Match(limits::kURI, syntax::IsPchar);
+    auto view = segment_parser.Match(hypp::detail::limits::kURI,
+                                     syntax::IsPchar);
     if (const auto pos = view.find(':'); pos != view.npos) {
       view = view.substr(0, pos);
     }
@@ -223,7 +224,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     if (!parser.Peek('/')) {
       return std::string_view{};
     }
-    return parser.Match(limits::kURI,
+    return parser.Match(hypp::detail::limits::kURI,
         [](const char c) {
           return c == '/';
         },
@@ -304,7 +305,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
 // query = *( pchar / "/" / "?" )
 Expected<std::string_view> ParseUriQuery(Parser& parser) {
-  return parser.Match(limits::kURI,
+  return parser.Match(hypp::detail::limits::kURI,
       [](const char c) {
         return c == '/' || c == '?';
       },

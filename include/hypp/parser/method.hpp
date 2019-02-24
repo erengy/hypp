@@ -2,17 +2,18 @@
 
 #include <string_view>
 
+#include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
-#include <hypp/parser/limits.hpp>
 #include <hypp/parser/syntax.hpp>
 
 namespace hypp::parser {
 
 Expected<std::string_view> ParseMethod(Parser& parser) {
   // method = token
-  const auto view = parser.Match(limits::kMethod, syntax::IsTchar);
+  const auto view = parser.Match(hypp::detail::limits::kMethod,
+                                 syntax::IsTchar);
 
   if (view.empty()) {
     return Unexpected{Error::Invalid_Method};

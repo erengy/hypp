@@ -2,18 +2,18 @@
 
 #include <string_view>
 
+#include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
 #include <hypp/parser/header.hpp>
-#include <hypp/parser/limits.hpp>
 #include <hypp/parser/syntax.hpp>
 #include <hypp/message.hpp>
 
 namespace hypp::parser {
 
 Expected<std::string_view> ParseMessageBody(Parser& parser) {
-  if (parser.size() > limits::kBody) {
+  if (parser.size() > hypp::detail::limits::kBody) {
     return Unexpected{Error::Payload_Too_Large};
   }
 

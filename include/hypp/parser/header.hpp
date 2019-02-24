@@ -1,9 +1,9 @@
 #pragma once
 
+#include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
-#include <hypp/parser/limits.hpp>
 #include <hypp/parser/syntax.hpp>
 #include <hypp/header.hpp>
 
@@ -11,7 +11,8 @@ namespace hypp::parser {
 
 Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   // field-name = token
-  const auto name = parser.Match(limits::kFieldName, syntax::IsTchar);
+  const auto name = parser.Match(hypp::detail::limits::kFieldName,
+                                 syntax::IsTchar);
   if (name.empty()) {
     return Unexpected{Error::Invalid_Header_Name};
   }
@@ -27,7 +28,7 @@ Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
   // https://github.com/httpwg/http-core/issues/19
   //
   // Note that empty values are allowed.
-  return parser.Match(limits::kFieldValue,
+  return parser.Match(hypp::detail::limits::kFieldValue,
       [&parser](const char c) {
         switch (c) {
           default:
@@ -80,7 +81,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
   const auto initial_size = parser.size();
 
   while (!parser.empty()) {
-    if (initial_size - parser.size() > limits::kHeaderFields) {
+    if (initial_size - parser.size() > hypp::detail::limits::kHeaderFields) {
       return Unexpected{Error::Request_Header_Fields_Too_Large};
     }
 

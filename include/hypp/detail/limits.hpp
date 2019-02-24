@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <limits>
 
-namespace hypp::parser::limits {
+namespace hypp::detail::limits {
 
 // > When a received protocol element is parsed, the recipient MUST be able to
 // parse any value of reasonable length. (...) HTTP does not have specific
@@ -65,4 +65,4 @@ constexpr size_t kPort         = ARBITRARY(16);  // "80", "8888", etc.
 #undef EXACTLY
 #undef ARBITRARY
 
-}  // namespace hypp::parser::limits
+}  // namespace hypp::detail::limits
