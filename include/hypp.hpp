@@ -4,6 +4,7 @@
 #include <hypp/generator/message.hpp>
 #include <hypp/generator/request.hpp>
 #include <hypp/generator/response.hpp>
+#include <hypp/generator/status.hpp>
 #include <hypp/generator/uri.hpp>
 #include <hypp/generator/version.hpp>
 
