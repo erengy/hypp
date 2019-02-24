@@ -23,81 +23,81 @@ public:
     return v_.size();
   }
 
-  constexpr bool Peek(const char c) const {
+  constexpr bool peek(const char c) const {
     return !v_.empty() && v_.front() == c;
   }
-  constexpr bool Peek(const view_t s) const {
+  constexpr bool peek(const view_t s) const {
     return v_.size() >= s.size() && v_.compare(0, s.size(), s) == 0;
   }
-  bool Peek(const pred_t p) const {
+  bool peek(const pred_t p) const {
     return !v_.empty() && p(v_.front());
   }
-  size_t Peek(const func_t f) const {
+  size_t peek(const func_t f) const {
     return !v_.empty() ? f(v_) : size_t{0};
   }
 
-  size_t Count(size_t count, const pred_t p) const {
-    count = std::min(count, v_.size());
-    const auto it = std::find_if_not(v_.begin(), v_.begin() + count, p);
+  size_t count(size_t n, const pred_t p) const {
+    n = std::min(n, v_.size());
+    const auto it = std::find_if_not(v_.begin(), v_.begin() + n, p);
     return std::distance(v_.begin(), it);
   }
-  size_t Count(size_t count, const func_t f) const {
-    view_t v{v_.substr(0, count)};
-    while (!v.empty() && (count = f(v))) {
-      v.remove_prefix(count);
+  size_t count(size_t n, const func_t f) const {
+    view_t v{v_.substr(0, n)};
+    while (!v.empty() && (n = f(v))) {
+      v.remove_prefix(n);
     }
     return v_.size() - v.size();
   }
 
-  char Match(const pred_t p) {
-    return Peek(p) ? Read() : '\0';
+  char match(const pred_t p) {
+    return peek(p) ? read() : '\0';
   }
-  view_t Match(const func_t f) {
-    return Read(Peek(f));
+  view_t match(const func_t f) {
+    return read(peek(f));
   }
-  view_t Match(const size_t count, const pred_t p) {
-    return Read(Count(count, p));
+  view_t match(const size_t n, const pred_t p) {
+    return read(count(n, p));
   }
-  view_t Match(const size_t count, const func_t f) {
-    return Read(Count(count, f));
+  view_t match(const size_t n, const func_t f) {
+    return read(count(n, f));
   }
-  view_t Match(const size_t count, const pred_t p, const func_t f) {
+  view_t match(const size_t n, const pred_t p, const func_t f) {
     const auto f_both = [&](const view_t v) {
       return p(v.front()) ? size_t{1} : f(v);
     };
-    return Read(Count(count, f_both));
+    return read(count(n, f_both));
   }
 
-  constexpr char Read() {
+  constexpr char read() {
     const char c = !v_.empty() ? v_.front() : '\0';
     v_.remove_prefix(c ? 1 : 0);
     return c;
   }
-  constexpr view_t Read(const size_t count) {
-    const view_t s = v_.substr(0, count);
+  constexpr view_t read(const size_t n) {
+    const view_t s = v_.substr(0, n);
     v_.remove_prefix(s.size());
     return s;
   }
-  constexpr view_t ReadAll() {
-    return Read(v_.size());
+  constexpr view_t read_all() {
+    return read(v_.size());
   }
 
-  constexpr bool Remove(const size_t count) {
-    const size_t rcount = std::min(count, v_.size());
-    v_.remove_prefix(rcount);
-    return count && count == rcount;
+  constexpr bool remove(const size_t n) {
+    const size_t rn = std::min(n, v_.size());
+    v_.remove_prefix(rn);
+    return n && n == rn;
   }
 
-  constexpr bool Skip(const char c) {
-    return Peek(c) && Remove(size_t{1});
+  constexpr bool skip(const char c) {
+    return peek(c) && remove(size_t{1});
   }
-  constexpr bool Skip(const view_t s) {
-    return Peek(s) && Remove(s.size());
+  constexpr bool skip(const view_t s) {
+    return peek(s) && remove(s.size());
   }
 
-  constexpr bool Strip(const view_t s) {
+  constexpr bool strip(const view_t s) {
     const auto pos = v_.find_first_not_of(s);
-    return pos != view_t::npos && Remove(pos);
+    return pos != view_t::npos && remove(pos);
   }
 
 private:

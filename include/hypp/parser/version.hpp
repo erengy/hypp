@@ -57,19 +57,19 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
   //
   // > The expectation to support HTTP/0.9 requests has been removed.
   // Reference: https://tools.ietf.org/html/rfc7230#appendix-A.2
-  if (!parser.Skip("HTTP/")) {
+  if (!parser.skip("HTTP/")) {
     return Unexpected{Error::Invalid_HTTP_Name};
   }
 
   // DIGIT "." DIGIT
-  const auto major = parser.Match(hypp::detail::IsDigit);
+  const auto major = parser.match(hypp::detail::is_digit);
   if (!major) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
-  if (!parser.Skip('.')) {
+  if (!parser.skip('.')) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
-  const auto minor = parser.Match(hypp::detail::IsDigit);
+  const auto minor = parser.match(hypp::detail::is_digit);
   if (!minor) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }

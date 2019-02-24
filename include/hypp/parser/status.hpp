@@ -11,8 +11,8 @@ namespace hypp {
 
 Expected<status::code_t> ParseStatusCode(Parser& parser) {
   // status-code = 3DIGIT
-  const auto view = parser.Match(hypp::detail::limits::kStatusCode,
-                                 hypp::detail::IsDigit);
+  const auto view = parser.match(hypp::detail::limits::kStatusCode,
+                                 hypp::detail::is_digit);
 
   if (view.size() != hypp::detail::limits::kStatusCode) {
     return Unexpected{Error::Invalid_Status_Code};
@@ -23,14 +23,14 @@ Expected<status::code_t> ParseStatusCode(Parser& parser) {
 
 Expected<std::string_view> ParseReasonPhrase(Parser& parser) {
   // reason-phrase = *( HTAB / SP / VCHAR / obs-text )
-  return parser.Match(hypp::detail::limits::kReasonPhrase,
+  return parser.match(hypp::detail::limits::kReasonPhrase,
       [](const char c) {
         switch (c) {
           case hypp::detail::syntax::kHTAB:
           case hypp::detail::syntax::kSP:
             return true;
           default:
-            return hypp::detail::IsVchar(c) || hypp::detail::IsObsText(c);
+            return hypp::detail::is_vchar(c) || hypp::detail::is_obs_text(c);
         }
       });
 }

@@ -10,16 +10,16 @@ namespace hypp {
 
 // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 Expected<std::string_view> ParseUriScheme(Parser& parser) {
-  if (!parser.Peek(hypp::detail::IsAlpha)) {
+  if (!parser.peek(hypp::detail::is_alpha)) {
     return Unexpected{Error::Invalid_URI_Scheme};
   }
-  return parser.Match(hypp::detail::limits::kScheme,
+  return parser.match(hypp::detail::limits::kScheme,
       [](const char c) {
         switch (c) {
           case '+': case '-': case '.':
             return true;
           default:
-            return hypp::detail::IsAlpha(c) || hypp::detail::IsDigit(c);
+            return hypp::detail::is_alpha(c) || hypp::detail::is_digit(c);
         }
       });
 }
@@ -28,24 +28,24 @@ Expected<std::string_view> ParseUriScheme(Parser& parser) {
 
 // userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
 Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
-  return parser.Match(hypp::detail::limits::kURI,
+  return parser.match(hypp::detail::limits::kURI,
       [](const char c) {
         switch (c) {
           case ':':
             return true;
           default:
-            return hypp::detail::IsUnreserved(c) || hypp::detail::IsSubDelim(c);
+            return hypp::detail::is_unreserved(c) || hypp::detail::is_sub_delim(c);
         }
       },
       [](const std::string_view view) {
-        return hypp::detail::IsPctEncoded(view);
+        return hypp::detail::is_pct_encoded(view);
       });
 }
 
 // IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
 Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   // "["
-  if (!parser.Skip('[')) {
+  if (!parser.skip('[')) {
     return Unexpected{Error::Invalid_URI_Host};
   }
 
@@ -57,7 +57,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   // the application should return an appropriate error for "address mechanism
   // not supported".
   // Reference: https://tools.ietf.org/html/rfc3986#section-3.2.2
-  if (parser.Peek('v') || parser.Peek('V')) {
+  if (parser.peek('v') || parser.peek('V')) {
     return Unexpected{Error::Address_Mechanism_Not_Supported};
   }
 
@@ -76,7 +76,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   //
   // h16         = 1*4HEXDIG
   //             ; 16 bits of address represented in hexadecimal
-  const auto view = parser.Match(hypp::detail::limits::kURI,
+  const auto view = parser.match(hypp::detail::limits::kURI,
       [](const char c) {
         // @TODO: Parse properly
         switch (c) {
@@ -84,7 +84,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
           case '.':  // for IPv4address
             return true;
           default:
-            return hypp::detail::IsHexDigit(c);
+            return hypp::detail::is_hex_digit(c);
         }
       });
   if (view.empty()) {
@@ -92,7 +92,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   }
 
   // "]"
-  if (!parser.Skip(']')) {
+  if (!parser.skip(']')) {
     return Unexpected{Error::Invalid_URI_Host};
   }
 
@@ -104,26 +104,26 @@ Expected<std::string_view> ParseIpV4Address(Parser& parser) {
   Parser ip_parser{parser};
 
   for (int i = 0; i < 4; ++i) {
-    if (i > 0 && !ip_parser.Skip('.')) {
+    if (i > 0 && !ip_parser.skip('.')) {
       return Unexpected{Error::Invalid_URI_Host};
     }
-    const auto dec_octet = ip_parser.Match(hypp::detail::IsDecOctet);
+    const auto dec_octet = ip_parser.match(hypp::detail::is_dec_octet);
     if (dec_octet.empty()) {
       return Unexpected{Error::Invalid_URI_Host};
     }
   }
 
-  return parser.Read(parser.size() - ip_parser.size());
+  return parser.read(parser.size() - ip_parser.size());
 }
 
 // reg-name = *( unreserved / pct-encoded / sub-delims )
 Expected<std::string_view> ParseRegisteredName(Parser& parser) {
-  return parser.Match(hypp::detail::limits::kURI,
+  return parser.match(hypp::detail::limits::kURI,
       [](const char c) {
-        return hypp::detail::IsUnreserved(c) || hypp::detail::IsSubDelim(c);
+        return hypp::detail::is_unreserved(c) || hypp::detail::is_sub_delim(c);
       },
       [](const std::string_view view) {
-        return hypp::detail::IsPctEncoded(view);
+        return hypp::detail::is_pct_encoded(view);
       });
 }
 
@@ -157,7 +157,7 @@ Expected<std::string_view> ParseUriHost(Parser& parser) {
 
 // port = *DIGIT
 Expected<std::string_view> ParseUriPort(Parser& parser) {
-  return parser.Match(hypp::detail::limits::kPort, hypp::detail::IsDigit);
+  return parser.match(hypp::detail::limits::kPort, hypp::detail::is_digit);
 }
 
 // authority = [ userinfo "@" ] host [ ":" port ]
@@ -167,9 +167,9 @@ Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
   // [ userinfo "@" ]
   Parser user_info_parser{parser};
   if (const auto expected = ParseUriUserInfo(user_info_parser)) {
-    if (user_info_parser.Skip('@')) {
+    if (user_info_parser.skip('@')) {
       authority.user_info = expected.value();
-      parser.Remove(parser.size() - user_info_parser.size());
+      parser.remove(parser.size() - user_info_parser.size());
     }
   } else {
     return Unexpected{expected.error()};
@@ -183,7 +183,7 @@ Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
   }
 
   // [ ":" port ]
-  if (parser.Skip(':')) {
+  if (parser.skip(':')) {
     if (const auto expected = ParseUriPort(parser)) {
       authority.port = expected.value();
     } else {
@@ -219,27 +219,27 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
   //               ; non-zero-length segment without any colon ":"
   const auto parse_segment = [](Parser& parser) {
-    return parser.Match(hypp::detail::limits::kURI, hypp::detail::IsPchar);
+    return parser.match(hypp::detail::limits::kURI, hypp::detail::is_pchar);
   };
   const auto parse_segment_nz_nc = [](Parser& parser) {
     Parser segment_parser{parser};
-    auto view = segment_parser.Match(hypp::detail::limits::kURI,
-                                     hypp::detail::IsPchar);
+    auto view = segment_parser.match(hypp::detail::limits::kURI,
+                                     hypp::detail::is_pchar);
     if (const auto pos = view.find(':'); pos != view.npos) {
       view = view.substr(0, pos);
     }
-    return parser.Read(parser.size() - segment_parser.size());
+    return parser.read(parser.size() - segment_parser.size());
   };
   const auto parse_slash_segment = [](Parser& parser) {
-    if (!parser.Peek('/')) {
+    if (!parser.peek('/')) {
       return std::string_view{};
     }
-    return parser.Match(hypp::detail::limits::kURI,
+    return parser.match(hypp::detail::limits::kURI,
         [](const char c) {
           return c == '/';
         },
         [](const std::string_view view) {
-          return hypp::detail::IsPchar(view);
+          return hypp::detail::is_pchar(view);
         });
   };
 
@@ -258,7 +258,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // with "//".)
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.7
   if (flags & kUriAbsolutePath) {
-    if (!parser.Peek('/')) {
+    if (!parser.peek('/')) {
       return Unexpected{Error::Invalid_URI_Path};
     }
     return parse_slash_segment(parser);
@@ -268,15 +268,15 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   //               ; begins with "/" but not "//"
   if (flags & kUriPathAbsolute) {
     Parser path_parser{parser};
-    if (path_parser.Skip('/')) {
-      if (path_parser.Peek('/')) {
+    if (path_parser.skip('/')) {
+      if (path_parser.peek('/')) {
         return Unexpected{Error::Invalid_URI_Path};
       }
       const auto segment_nz = parse_segment(path_parser);
       if (!segment_nz.empty()) {
         parse_slash_segment(path_parser);
       }
-      return parser.Read(parser.size() - path_parser.size());
+      return parser.read(parser.size() - path_parser.size());
     }
   }
 
@@ -287,7 +287,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     const auto segment_nz_nc = parse_segment_nz_nc(path_parser);
     if (!segment_nz_nc.empty()) {
       parse_slash_segment(path_parser);
-      return parser.Read(parser.size() - path_parser.size());
+      return parser.read(parser.size() - path_parser.size());
     }
   }
 
@@ -298,7 +298,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     const auto segment_nz = parse_segment(path_parser);
     if (!segment_nz.empty()) {
       parse_slash_segment(path_parser);
-      return parser.Read(parser.size() - path_parser.size());
+      return parser.read(parser.size() - path_parser.size());
     }
   }
 
@@ -315,12 +315,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
 // query = *( pchar / "/" / "?" )
 Expected<std::string_view> ParseUriQuery(Parser& parser) {
-  return parser.Match(hypp::detail::limits::kURI,
+  return parser.match(hypp::detail::limits::kURI,
       [](const char c) {
         return c == '/' || c == '?';
       },
       [](const std::string_view view) {
-        return hypp::detail::IsPchar(view);
+        return hypp::detail::is_pchar(view);
       });
 }
 
@@ -341,7 +341,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(':')) {
+  if (!parser.skip(':')) {
     return Unexpected{Error::Invalid_URI};
   }
 
@@ -349,7 +349,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   //           / path-absolute
   //           / path-rootless
   //           / path-empty
-  if (parser.Skip("//")) {
+  if (parser.skip("//")) {
     if (const auto expected = ParseUriAuthority(parser)) {
       uri.authority = expected.value();
     } else {
@@ -365,7 +365,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   }
 
   // [ "?" query ]
-  if (parser.Skip('?')) {
+  if (parser.skip('?')) {
     if (const auto expected = ParseUriQuery(parser)) {
       uri.query = expected.value();
     } else {
@@ -388,7 +388,7 @@ Expected<Uri> ParseUri(Parser& parser) {
   }
 
   // [ "#" fragment ]
-  if (parser.Skip('#')) {
+  if (parser.skip('#')) {
     if (const auto expected = ParseUriFragment(parser)) {
       uri.fragment = expected.value();
     } else {
@@ -407,7 +407,7 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
   //               / path-absolute
   //               / path-noscheme
   //               / path-empty
-  if (parser.Skip("//")) {
+  if (parser.skip("//")) {
     if (const auto expected = ParseUriAuthority(parser)) {
       uri.authority = expected.value();
     } else {
@@ -423,7 +423,7 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
   }
 
   // [ "?" query ]
-  if (parser.Skip('?')) {
+  if (parser.skip('?')) {
     if (const auto expected = ParseUriQuery(parser)) {
       uri.query = expected.value();
     } else {
@@ -446,7 +446,7 @@ Expected<Uri> ParseRelativeReference(Parser& parser) {
   }
 
   // [ "#" fragment ]
-  if (parser.Skip('#')) {
+  if (parser.skip('#')) {
     if (const auto expected = ParseUriFragment(parser)) {
       uri.fragment = expected.value();
     } else {

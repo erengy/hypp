@@ -15,14 +15,14 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   RequestTarget request_target;
 
   // origin-form = absolute-path [ "?" query ]
-  if (parser.Peek('/')) {
+  if (parser.peek('/')) {
     request_target.form = RequestTarget::Form::Origin;
     if (const auto expected = ParseUriPath(parser, kUriAbsolutePath)) {
       request_target.uri.path = expected.value();
     } else {
       return Unexpected{Error::Invalid_Request_Target};
     }
-    if (parser.Skip('?')) {
+    if (parser.skip('?')) {
       if (const auto expected = ParseUriQuery(parser)) {
         request_target.uri.query = expected.value();
       } else {
@@ -40,7 +40,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   }
 
   // asterisk-form = "*"
-  if (parser.Skip('*')) {
+  if (parser.skip('*')) {
     request_target.form = RequestTarget::Form::Asterisk;
     return request_target;
   }
@@ -62,7 +62,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   // and parse a request-line SHOULD ignore at least one empty line (CRLF)
   // received prior to the request-line.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3.5
-  parser.Skip(hypp::detail::syntax::kCRLF);
+  parser.skip(hypp::detail::syntax::kCRLF);
 
   // method SP
   if (const auto expected = ParseMethod(parser)) {
@@ -70,7 +70,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(hypp::detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Request};
   }
 
@@ -80,7 +80,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(hypp::detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Request};
   }
 
@@ -90,7 +90,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(hypp::detail::syntax::kCRLF)) {
+  if (!parser.skip(hypp::detail::syntax::kCRLF)) {
     return Unexpected{Error::Bad_Request};
   }
 

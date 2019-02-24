@@ -16,7 +16,7 @@ Expected<std::string_view> ParseMessageBody(Parser& parser) {
     return Unexpected{Error::Payload_Too_Large};
   }
 
-  return parser.ReadAll();
+  return parser.read_all();
 }
 
 template <typename MessageT>
@@ -36,7 +36,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   // first header field MUST either reject the message as invalid or consume
   // each whitespace-preceded line without further processing of it.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3
-  if (parser.Strip(hypp::detail::syntax::kWhitespace)) {
+  if (parser.strip(hypp::detail::syntax::kWhitespace)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 
@@ -46,7 +46,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(hypp::detail::syntax::kCRLF)) {
+  if (!parser.skip(hypp::detail::syntax::kCRLF)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 
