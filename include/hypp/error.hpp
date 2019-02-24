@@ -2,7 +2,7 @@
 
 #include <hypp/detail/expected.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 // > HTTP does not define specific error handling mechanisms except when they
 // have a direct impact on security, since different applications of the
@@ -52,4 +52,4 @@ using Unexpected = hypp::detail::Unexpected<Error>;
 template <typename T>
 using Expected = hypp::detail::Expected<T, Error>;
 
-}  // namespace hypp::parser
+}  // namespace hypp

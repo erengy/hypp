@@ -5,8 +5,8 @@
 #include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
 #include <hypp/detail/syntax.hpp>
-#include <hypp/parser/error.hpp>
 #include <hypp/parser/header.hpp>
+#include <hypp/error.hpp>
 #include <hypp/message.hpp>
 
 namespace hypp::parser {

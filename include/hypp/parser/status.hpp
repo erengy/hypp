@@ -4,7 +4,7 @@
 #include <hypp/detail/parser.hpp>
 #include <hypp/detail/syntax.hpp>
 #include <hypp/detail/util.hpp>
-#include <hypp/parser/error.hpp>
+#include <hypp/error.hpp>
 #include <hypp/status.hpp>
 
 namespace hypp::parser {
