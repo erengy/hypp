@@ -3,7 +3,6 @@
 #include <hypp/detail/parser.hpp>
 #include <hypp/detail/syntax.hpp>
 #include <hypp/parser/error.hpp>
-#include <hypp/parser/expected.hpp>
 #include <hypp/parser/message.hpp>
 #include <hypp/parser/method.hpp>
 #include <hypp/parser/uri.hpp>

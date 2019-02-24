@@ -5,7 +5,6 @@
 #include <hypp/detail/syntax.hpp>
 #include <hypp/detail/util.hpp>
 #include <hypp/parser/error.hpp>
-#include <hypp/parser/expected.hpp>
 #include <hypp/status.hpp>
 
 namespace hypp::parser {

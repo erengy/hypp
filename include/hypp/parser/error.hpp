@@ -1,5 +1,7 @@
 #pragma once
 
+#include <hypp/detail/expected.hpp>
+
 namespace hypp::parser {
 
 // > HTTP does not define specific error handling mechanisms except when they
@@ -44,5 +46,10 @@ enum class Error {
   Invalid_HTTP_Name,
   Invalid_HTTP_Version,
 };
+
+using Unexpected = hypp::detail::Unexpected<Error>;
+
+template <typename T>
+using Expected = hypp::detail::Expected<T, Error>;
 
 }  // namespace hypp::parser
