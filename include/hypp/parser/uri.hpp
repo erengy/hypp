@@ -197,6 +197,17 @@ Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// Reference: https://tools.ietf.org/html/rfc3986#section-3.3
+// Reference: https://tools.ietf.org/html/rfc7230#section-2.7
+enum UriPathRules {
+  kUriPathAbEmpty  = 1 << 0,
+  kUriAbsolutePath = 1 << 1,  // RFC 7230
+  kUriPathAbsolute = 1 << 2,
+  kUriPathNoScheme = 1 << 3,
+  kUriPathRootless = 1 << 4,
+  kUriPathEmpty    = 1 << 5,
+};
+
 // path = path-abempty   ; begins with "/" or is empty
 //      / path-absolute  ; begins with "/" but not "//"
 //      / path-noscheme  ; begins with a non-colon segment
@@ -235,7 +246,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
   // path-abempty = *( "/" segment )
   //              ; begins with "/" or is empty
-  if (flags & syntax::kPathAbEmpty) {
+  if (flags & kUriPathAbEmpty) {
     return parse_slash_segment(parser);
   }
 
@@ -247,7 +258,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // references, and path-absolute rule, which does not allow paths that begin
   // with "//".)
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.7
-  if (flags & syntax::kAbsolutePath) {
+  if (flags & kUriAbsolutePath) {
     if (!parser.Peek('/')) {
       return Unexpected{Error::Invalid_URI_Path};
     }
@@ -256,7 +267,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
   // path-absolute = "/" [ segment-nz *( "/" segment ) ]
   //               ; begins with "/" but not "//"
-  if (flags & syntax::kPathAbsolute) {
+  if (flags & kUriPathAbsolute) {
     Parser path_parser{parser};
     if (path_parser.Skip('/')) {
       if (path_parser.Peek('/')) {
@@ -272,7 +283,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
   // path-noscheme = segment-nz-nc *( "/" segment )
   //               ; begins with a non-colon segment
-  if (flags & syntax::kPathNoScheme) {
+  if (flags & kUriPathNoScheme) {
     Parser path_parser{parser};
     const auto segment_nz_nc = parse_segment_nz_nc(path_parser);
     if (!segment_nz_nc.empty()) {
@@ -283,7 +294,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
   // path-rootless = segment-nz *( "/" segment )
   //               ; begins with a segment
-  if (flags & syntax::kPathRootless) {
+  if (flags & kUriPathRootless) {
     Parser path_parser{parser};
     const auto segment_nz = parse_segment(path_parser);
     if (!segment_nz.empty()) {
@@ -294,7 +305,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
   // path-empty = 0<pchar>
   //            ; zero characters
-  if (flags & syntax::kPathEmpty) {
+  if (flags & kUriPathEmpty) {
     return std::string_view{};
   }
 
@@ -346,8 +357,8 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
       return Unexpected{expected.error()};
     }
   }
-  const auto kPathRules = uri.authority ? syntax::kPathAbEmpty :
-      syntax::kPathAbsolute | syntax::kPathRootless | syntax::kPathEmpty;
+  const auto kPathRules = uri.authority ? kUriPathAbEmpty :
+      kUriPathAbsolute | kUriPathRootless | kUriPathEmpty;
   if (const auto expected = ParseUriPath(parser, kPathRules)) {
     uri.path = expected.value();
   } else {
@@ -404,8 +415,8 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
       return Unexpected{expected.error()};
     }
   }
-  const auto kPathRules = uri.authority ? syntax::kPathAbEmpty :
-      syntax::kPathAbsolute | syntax::kPathNoScheme | syntax::kPathEmpty;
+  const auto kPathRules = uri.authority ? kUriPathAbEmpty :
+      kUriPathAbsolute | kUriPathNoScheme | kUriPathEmpty;
   if (const auto expected = ParseUriPath(parser, kPathRules)) {
     uri.path = expected.value();
   } else {

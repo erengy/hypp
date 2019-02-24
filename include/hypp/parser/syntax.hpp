@@ -17,17 +17,6 @@ constexpr auto kHttpName = "HTTP";   // HTTP name (case-sensitive)
 constexpr auto kSP = ' ';            // Space
 constexpr auto kWhitespace = " \t";  // Whitespace (SP / HTAB)
 
-// Reference: https://tools.ietf.org/html/rfc3986#section-3.3
-// Reference: https://tools.ietf.org/html/rfc7230#section-2.7
-enum PathRules {
-  kPathAbEmpty  = 1 << 0,
-  kAbsolutePath = 1 << 1,  // RFC 7230
-  kPathAbsolute = 1 << 2,
-  kPathNoScheme = 1 << 3,
-  kPathRootless = 1 << 4,
-  kPathEmpty    = 1 << 5,
-};
-
 constexpr bool IsAlpha(const char c) {
   // ALPHA = %x41-5A / %x61-7A  ; A-Z / a-z
   return ('A' <= c && c <= 'Z') ||

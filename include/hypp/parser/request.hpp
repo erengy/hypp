@@ -18,7 +18,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   // origin-form = absolute-path [ "?" query ]
   if (parser.Peek('/')) {
     request_target.form = RequestTarget::Form::Origin;
-    if (const auto expected = ParseUriPath(parser, syntax::kAbsolutePath)) {
+    if (const auto expected = ParseUriPath(parser, kUriAbsolutePath)) {
       request_target.uri.path = expected.value();
     } else {
       return Unexpected{Error::Invalid_Request_Target};
