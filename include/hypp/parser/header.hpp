@@ -6,7 +6,7 @@
 #include <hypp/error.hpp>
 #include <hypp/header.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   // field-name = token
@@ -102,4 +102,4 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
   return header;
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

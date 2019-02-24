@@ -8,7 +8,7 @@
 #include <hypp/error.hpp>
 #include <hypp/response.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<StatusLine> ParseStatusLine(Parser& parser) {
   StatusLine status_line;
@@ -54,4 +54,4 @@ Expected<Response> ParseResponse(const std::string_view view) {
   return ParseMessage<Response>(view);
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

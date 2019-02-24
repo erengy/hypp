@@ -7,7 +7,7 @@
 #include <hypp/detail/syntax.hpp>
 #include <hypp/error.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<std::string_view> ParseMethod(Parser& parser) {
   // method = token
@@ -28,4 +28,4 @@ Expected<std::string_view> ParseMethod(Parser& parser) {
   return view;
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

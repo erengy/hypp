@@ -7,7 +7,7 @@
 #include <hypp/error.hpp>
 #include <hypp/status.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<status::code_t> ParseStatusCode(Parser& parser) {
   // status-code = 3DIGIT
@@ -35,4 +35,4 @@ Expected<std::string_view> ParseReasonPhrase(Parser& parser) {
       });
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

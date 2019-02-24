@@ -9,7 +9,7 @@
 #include <hypp/error.hpp>
 #include <hypp/message.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<std::string_view> ParseMessageBody(Parser& parser) {
   if (parser.size() > hypp::detail::limits::kBody) {
@@ -60,4 +60,4 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   return message;
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

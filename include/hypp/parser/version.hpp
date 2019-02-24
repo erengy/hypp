@@ -7,7 +7,7 @@
 #include <hypp/error.hpp>
 #include <hypp/version.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 namespace detail {
 
@@ -81,4 +81,4 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
   return HttpVersion{major, minor};
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

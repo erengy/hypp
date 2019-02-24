@@ -6,7 +6,7 @@
 #include <hypp/error.hpp>
 #include <hypp/uri.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 Expected<std::string_view> ParseUriScheme(Parser& parser) {
@@ -476,4 +476,4 @@ Expected<Uri> ParseUriReference(Parser& parser) {
   return uri;
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp

@@ -9,7 +9,7 @@
 #include <hypp/error.hpp>
 #include <hypp/request.hpp>
 
-namespace hypp::parser {
+namespace hypp {
 
 Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   RequestTarget request_target;
@@ -106,4 +106,4 @@ Expected<Request> ParseRequest(const std::string_view view) {
   return ParseMessage<Request>(view);
 }
 
-}  // namespace hypp::parser
+}  // namespace hypp
