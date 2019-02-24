@@ -94,8 +94,8 @@ enum Code : code_t {
 // status code of 471 is received by a client, the client can (...) treat the
 // response as if it had received a 400 (Bad Request) status code.
 // Reference: https://tools.ietf.org/html/rfc7231#section-6
-constexpr Class GetClass(const Code code) {
-  return static_cast<Class>((code / 100) * 100);
+constexpr code_t GetClass(const code_t code) {
+  return static_cast<code_t>((code / 100) * 100);
 }
 
 // Reference: https://tools.ietf.org/html/rfc7231#section-6.1
