@@ -12,7 +12,7 @@
 namespace hypp {
 
 Expected<std::string_view> ParseMessageBody(Parser& parser) {
-  if (parser.size() > hypp::detail::limits::kBody) {
+  if (parser.size() > detail::limits::kBody) {
     return Unexpected{Error::Payload_Too_Large};
   }
 
@@ -36,7 +36,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   // first header field MUST either reject the message as invalid or consume
   // each whitespace-preceded line without further processing of it.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3
-  if (parser.strip(hypp::detail::syntax::kWhitespace)) {
+  if (parser.strip(detail::syntax::kWhitespace)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 
@@ -46,7 +46,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kCRLF)) {
+  if (!parser.skip(detail::syntax::kCRLF)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 

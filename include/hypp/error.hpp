@@ -47,9 +47,9 @@ enum class Error {
   Invalid_HTTP_Version,
 };
 
-using Unexpected = hypp::detail::Unexpected<Error>;
+using Unexpected = detail::Unexpected<Error>;
 
 template <typename T>
-using Expected = hypp::detail::Expected<T, Error>;
+using Expected = detail::Expected<T, Error>;
 
 }  // namespace hypp

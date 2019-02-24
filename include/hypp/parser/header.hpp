@@ -10,8 +10,7 @@ namespace hypp {
 
 Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   // field-name = token
-  const auto name = parser.match(hypp::detail::limits::kFieldName,
-                                 hypp::detail::is_tchar);
+  const auto name = parser.match(detail::limits::kFieldName, detail::is_tchar);
   if (name.empty()) {
     return Unexpected{Error::Invalid_Header_Name};
   }
@@ -27,15 +26,15 @@ Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
   // https://github.com/httpwg/http-core/issues/19
   //
   // Note that empty values are allowed.
-  return parser.match(hypp::detail::limits::kFieldValue,
+  return parser.match(detail::limits::kFieldValue,
       [&parser](const char c) {
         switch (c) {
           default:
-            return hypp::detail::is_vchar(c) || hypp::detail::is_obs_text(c);
-          case hypp::detail::syntax::kSP:
-          case hypp::detail::syntax::kHTAB:
-            return parser.peek(hypp::detail::is_vchar) ||
-                   parser.peek(hypp::detail::is_obs_text);
+            return detail::is_vchar(c) || detail::is_obs_text(c);
+          case detail::syntax::kSP:
+          case detail::syntax::kHTAB:
+            return parser.peek(detail::is_vchar) ||
+                   parser.peek(detail::is_obs_text);
         }
       });
 }
@@ -59,7 +58,7 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
   }
 
   // OWS
-  parser.strip(hypp::detail::syntax::kWhitespace);
+  parser.strip(detail::syntax::kWhitespace);
 
   // field-value
   if (const auto expected = ParseHeaderFieldValue(parser)) {
@@ -69,7 +68,7 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
   }
 
   // OWS
-  parser.strip(hypp::detail::syntax::kWhitespace);
+  parser.strip(detail::syntax::kWhitespace);
 
   return header_field;
 }
@@ -80,11 +79,11 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
   const auto initial_size = parser.size();
 
   while (!parser.empty()) {
-    if (initial_size - parser.size() > hypp::detail::limits::kHeaderFields) {
+    if (initial_size - parser.size() > detail::limits::kHeaderFields) {
       return Unexpected{Error::Request_Header_Fields_Too_Large};
     }
 
-    if (parser.peek(hypp::detail::syntax::kCRLF)) {
+    if (parser.peek(detail::syntax::kCRLF)) {
       break;  // Empty line indicates the end of the header section
     }
 
@@ -94,7 +93,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
     } else {
       return Unexpected{expected.error()};
     }
-    if (!parser.skip(hypp::detail::syntax::kCRLF)) {
+    if (!parser.skip(detail::syntax::kCRLF)) {
       return Unexpected{Error::Invalid_Header_Format};
     }
   }

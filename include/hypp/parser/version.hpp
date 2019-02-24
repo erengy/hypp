@@ -62,14 +62,14 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
   }
 
   // DIGIT "." DIGIT
-  const auto major = parser.match(hypp::detail::is_digit);
+  const auto major = parser.match(detail::is_digit);
   if (!major) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
   if (!parser.skip('.')) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
-  const auto minor = parser.match(hypp::detail::is_digit);
+  const auto minor = parser.match(detail::is_digit);
   if (!minor) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }

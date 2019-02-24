@@ -62,7 +62,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   // and parse a request-line SHOULD ignore at least one empty line (CRLF)
   // received prior to the request-line.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3.5
-  parser.skip(hypp::detail::syntax::kCRLF);
+  parser.skip(detail::syntax::kCRLF);
 
   // method SP
   if (const auto expected = ParseMethod(parser)) {
@@ -70,7 +70,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Request};
   }
 
@@ -80,7 +80,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Request};
   }
 
@@ -90,7 +90,7 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kCRLF)) {
+  if (!parser.skip(detail::syntax::kCRLF)) {
     return Unexpected{Error::Bad_Request};
   }
 

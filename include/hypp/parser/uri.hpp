@@ -10,16 +10,16 @@ namespace hypp {
 
 // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 Expected<std::string_view> ParseUriScheme(Parser& parser) {
-  if (!parser.peek(hypp::detail::is_alpha)) {
+  if (!parser.peek(detail::is_alpha)) {
     return Unexpected{Error::Invalid_URI_Scheme};
   }
-  return parser.match(hypp::detail::limits::kScheme,
+  return parser.match(detail::limits::kScheme,
       [](const char c) {
         switch (c) {
           case '+': case '-': case '.':
             return true;
           default:
-            return hypp::detail::is_alpha(c) || hypp::detail::is_digit(c);
+            return detail::is_alpha(c) || detail::is_digit(c);
         }
       });
 }
@@ -28,17 +28,17 @@ Expected<std::string_view> ParseUriScheme(Parser& parser) {
 
 // userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
 Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
-  return parser.match(hypp::detail::limits::kURI,
+  return parser.match(detail::limits::kURI,
       [](const char c) {
         switch (c) {
           case ':':
             return true;
           default:
-            return hypp::detail::is_unreserved(c) || hypp::detail::is_sub_delim(c);
+            return detail::is_unreserved(c) || detail::is_sub_delim(c);
         }
       },
       [](const std::string_view view) {
-        return hypp::detail::is_pct_encoded(view);
+        return detail::is_pct_encoded(view);
       });
 }
 
@@ -76,7 +76,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   //
   // h16         = 1*4HEXDIG
   //             ; 16 bits of address represented in hexadecimal
-  const auto view = parser.match(hypp::detail::limits::kURI,
+  const auto view = parser.match(detail::limits::kURI,
       [](const char c) {
         // @TODO: Parse properly
         switch (c) {
@@ -84,7 +84,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
           case '.':  // for IPv4address
             return true;
           default:
-            return hypp::detail::is_hex_digit(c);
+            return detail::is_hex_digit(c);
         }
       });
   if (view.empty()) {
@@ -107,7 +107,7 @@ Expected<std::string_view> ParseIpV4Address(Parser& parser) {
     if (i > 0 && !ip_parser.skip('.')) {
       return Unexpected{Error::Invalid_URI_Host};
     }
-    const auto dec_octet = ip_parser.match(hypp::detail::is_dec_octet);
+    const auto dec_octet = ip_parser.match(detail::is_dec_octet);
     if (dec_octet.empty()) {
       return Unexpected{Error::Invalid_URI_Host};
     }
@@ -118,12 +118,12 @@ Expected<std::string_view> ParseIpV4Address(Parser& parser) {
 
 // reg-name = *( unreserved / pct-encoded / sub-delims )
 Expected<std::string_view> ParseRegisteredName(Parser& parser) {
-  return parser.match(hypp::detail::limits::kURI,
+  return parser.match(detail::limits::kURI,
       [](const char c) {
-        return hypp::detail::is_unreserved(c) || hypp::detail::is_sub_delim(c);
+        return detail::is_unreserved(c) || detail::is_sub_delim(c);
       },
       [](const std::string_view view) {
-        return hypp::detail::is_pct_encoded(view);
+        return detail::is_pct_encoded(view);
       });
 }
 
@@ -157,7 +157,7 @@ Expected<std::string_view> ParseUriHost(Parser& parser) {
 
 // port = *DIGIT
 Expected<std::string_view> ParseUriPort(Parser& parser) {
-  return parser.match(hypp::detail::limits::kPort, hypp::detail::is_digit);
+  return parser.match(detail::limits::kPort, detail::is_digit);
 }
 
 // authority = [ userinfo "@" ] host [ ":" port ]
@@ -219,12 +219,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
   //               ; non-zero-length segment without any colon ":"
   const auto parse_segment = [](Parser& parser) {
-    return parser.match(hypp::detail::limits::kURI, hypp::detail::is_pchar);
+    return parser.match(detail::limits::kURI, detail::is_pchar);
   };
   const auto parse_segment_nz_nc = [](Parser& parser) {
     Parser segment_parser{parser};
-    auto view = segment_parser.match(hypp::detail::limits::kURI,
-                                     hypp::detail::is_pchar);
+    auto view = segment_parser.match(detail::limits::kURI,
+                                     detail::is_pchar);
     if (const auto pos = view.find(':'); pos != view.npos) {
       view = view.substr(0, pos);
     }
@@ -234,12 +234,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     if (!parser.peek('/')) {
       return std::string_view{};
     }
-    return parser.match(hypp::detail::limits::kURI,
+    return parser.match(detail::limits::kURI,
         [](const char c) {
           return c == '/';
         },
         [](const std::string_view view) {
-          return hypp::detail::is_pchar(view);
+          return detail::is_pchar(view);
         });
   };
 
@@ -315,12 +315,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 
 // query = *( pchar / "/" / "?" )
 Expected<std::string_view> ParseUriQuery(Parser& parser) {
-  return parser.match(hypp::detail::limits::kURI,
+  return parser.match(detail::limits::kURI,
       [](const char c) {
         return c == '/' || c == '?';
       },
       [](const std::string_view view) {
-        return hypp::detail::is_pchar(view);
+        return detail::is_pchar(view);
       });
 }
 

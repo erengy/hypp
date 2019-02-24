@@ -19,7 +19,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Response};
   }
 
@@ -29,7 +29,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.skip(hypp::detail::syntax::kSP)) {
+  if (!parser.skip(detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Response};
   }
 
@@ -38,7 +38,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   // > A client SHOULD ignore the reason-phrase content.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3.1.2
   ParseReasonPhrase(parser);
-  if (!parser.skip(hypp::detail::syntax::kCRLF)) {
+  if (!parser.skip(detail::syntax::kCRLF)) {
     return Unexpected{Error::Bad_Response};
   }
 
