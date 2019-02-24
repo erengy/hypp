@@ -1,11 +1,11 @@
 #pragma once
 
 #include <hypp/detail/parser.hpp>
+#include <hypp/detail/syntax.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
 #include <hypp/parser/message.hpp>
 #include <hypp/parser/status.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/parser/version.hpp>
 #include <hypp/response.hpp>
 
@@ -20,7 +20,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(syntax::kSP)) {
+  if (!parser.Skip(hypp::detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Response};
   }
 
@@ -30,7 +30,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(syntax::kSP)) {
+  if (!parser.Skip(hypp::detail::syntax::kSP)) {
     return Unexpected{Error::Bad_Response};
   }
 
@@ -39,7 +39,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   // > A client SHOULD ignore the reason-phrase content.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3.1.2
   ParseReasonPhrase(parser);
-  if (!parser.Skip(syntax::kCRLF)) {
+  if (!parser.Skip(hypp::detail::syntax::kCRLF)) {
     return Unexpected{Error::Bad_Response};
   }
 

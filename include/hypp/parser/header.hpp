@@ -2,9 +2,9 @@
 
 #include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
+#include <hypp/detail/syntax.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/header.hpp>
 
 namespace hypp::parser {
@@ -12,7 +12,7 @@ namespace hypp::parser {
 Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   // field-name = token
   const auto name = parser.Match(hypp::detail::limits::kFieldName,
-                                 syntax::IsTchar);
+                                 hypp::detail::IsTchar);
   if (name.empty()) {
     return Unexpected{Error::Invalid_Header_Name};
   }
@@ -32,11 +32,11 @@ Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
       [&parser](const char c) {
         switch (c) {
           default:
-            return syntax::IsVchar(c) || syntax::IsObsText(c);
-          case syntax::kSP:
-          case syntax::kHTAB:
-            return parser.Peek(syntax::IsVchar) ||
-                   parser.Peek(syntax::IsObsText);
+            return hypp::detail::IsVchar(c) || hypp::detail::IsObsText(c);
+          case hypp::detail::syntax::kSP:
+          case hypp::detail::syntax::kHTAB:
+            return parser.Peek(hypp::detail::IsVchar) ||
+                   parser.Peek(hypp::detail::IsObsText);
         }
       });
 }
@@ -60,7 +60,7 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
   }
 
   // OWS
-  parser.Strip(syntax::kWhitespace);
+  parser.Strip(hypp::detail::syntax::kWhitespace);
 
   // field-value
   if (const auto expected = ParseHeaderFieldValue(parser)) {
@@ -70,7 +70,7 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
   }
 
   // OWS
-  parser.Strip(syntax::kWhitespace);
+  parser.Strip(hypp::detail::syntax::kWhitespace);
 
   return header_field;
 }
@@ -85,7 +85,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
       return Unexpected{Error::Request_Header_Fields_Too_Large};
     }
 
-    if (parser.Peek(syntax::kCRLF)) {
+    if (parser.Peek(hypp::detail::syntax::kCRLF)) {
       break;  // Empty line indicates the end of the header section
     }
 
@@ -95,7 +95,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
     } else {
       return Unexpected{expected.error()};
     }
-    if (!parser.Skip(syntax::kCRLF)) {
+    if (!parser.Skip(hypp::detail::syntax::kCRLF)) {
       return Unexpected{Error::Invalid_Header_Format};
     }
   }

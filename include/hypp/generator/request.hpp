@@ -3,9 +3,9 @@
 #include <string>
 
 #include <hypp/detail/util.hpp>
+#include <hypp/detail/syntax.hpp>
 #include <hypp/generator/uri.hpp>
 #include <hypp/generator/version.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/request.hpp>
 
 namespace hypp {
@@ -59,7 +59,7 @@ std::string to_string(RequestTarget target) {
 
 // request-line = method SP request-target SP HTTP-version CRLF
 std::string to_string(const RequestLine& request_line) {
-  using namespace parser::syntax;
+  using namespace detail::syntax;
   return detail::concat(
       request_line.method, kSP,
       to_string(request_line.target), kSP,

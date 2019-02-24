@@ -4,10 +4,10 @@
 
 #include <hypp/detail/limits.hpp>
 #include <hypp/detail/parser.hpp>
+#include <hypp/detail/syntax.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
 #include <hypp/parser/header.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/message.hpp>
 
 namespace hypp::parser {
@@ -37,7 +37,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   // first header field MUST either reject the message as invalid or consume
   // each whitespace-preceded line without further processing of it.
   // Reference: https://tools.ietf.org/html/rfc7230#section-3
-  if (parser.Strip(syntax::kWhitespace)) {
+  if (parser.Strip(hypp::detail::syntax::kWhitespace)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 
@@ -47,7 +47,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
   } else {
     return Unexpected{expected.error()};
   }
-  if (!parser.Skip(syntax::kCRLF)) {
+  if (!parser.Skip(hypp::detail::syntax::kCRLF)) {
     return Unexpected{Error::Invalid_Header_Format};
   }
 

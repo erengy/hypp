@@ -5,7 +5,9 @@
 
 #include <hypp/detail/util.hpp>
 
-namespace hypp::parser::syntax {
+namespace hypp::detail {
+
+namespace syntax {
 
 // Reference: https://tools.ietf.org/html/rfc3986#appendix-A
 // Reference: https://tools.ietf.org/html/rfc5234#appendix-B.1
@@ -16,6 +18,8 @@ constexpr auto kHTAB = '\t';         // Horizontal Tab
 constexpr auto kHttpName = "HTTP";   // HTTP name (case-sensitive)
 constexpr auto kSP = ' ';            // Space
 constexpr auto kWhitespace = " \t";  // Whitespace (SP / HTAB)
+
+}  // namespace syntax
 
 constexpr bool IsAlpha(const char c) {
   // ALPHA = %x41-5A / %x61-7A  ; A-Z / a-z
@@ -150,4 +154,4 @@ constexpr size_t IsPchar(const std::string_view view) {
   return view.size() - v.size();
 }
 
-}  // namespace hypp::parser::syntax
+}  // namespace hypp::detail

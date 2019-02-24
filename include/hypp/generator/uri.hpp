@@ -3,7 +3,6 @@
 #include <string>
 
 #include <hypp/detail/util.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/uri.hpp>
 
 namespace hypp {

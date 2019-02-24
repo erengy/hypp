@@ -3,9 +3,9 @@
 #include <optional>
 
 #include <hypp/detail/parser.hpp>
+#include <hypp/detail/syntax.hpp>
 #include <hypp/parser/error.hpp>
 #include <hypp/parser/expected.hpp>
-#include <hypp/parser/syntax.hpp>
 #include <hypp/version.hpp>
 
 namespace hypp::parser {
@@ -63,14 +63,14 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
   }
 
   // DIGIT "." DIGIT
-  const auto major = parser.Match(syntax::IsDigit);
+  const auto major = parser.Match(hypp::detail::IsDigit);
   if (!major) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
   if (!parser.Skip('.')) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
-  const auto minor = parser.Match(syntax::IsDigit);
+  const auto minor = parser.Match(hypp::detail::IsDigit);
   if (!minor) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
