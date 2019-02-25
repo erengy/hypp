@@ -33,8 +33,8 @@ hypp treats unsupported HTTP versions as errors, and does not attempt to recover
 #include <hypp.hpp>
 
 int main() {
-  // Returns hypp::parser::Expected<hypp::Response>
-  const auto expected_response = hypp::parser::ParseResponse(
+  // Returns hypp::Expected<hypp::Response>
+  const auto expected = hypp::ParseResponse(
         // Example response from RFC 7230 Section 2.1
         "HTTP/1.1 200 OK\r\n"
         "Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n"
@@ -49,13 +49,12 @@ int main() {
         "Hello World! My payload includes a trailing CRLF.\r\n"
       );
 
-  if (!expected_response) {
-    const auto error_code = static_cast<int>(expected_response.error());
-    std::cout << "Error: " << error_code << '\n';
+  if (!expected) {
+    std::cout << "Error: " << hypp::to_string(expected.error()) << '\n';
     return 1;
   }
 
-  const auto& r = expected_response.value();
+  const auto& r = expected.value();
   std::cout << r.start_line.code << '\n';             // 200
   std::cout << r.header.fields.back().value << '\n';  // text/plain
   std::cout << r.body.substr(0, 12) << '\n';          // Hello World!
