@@ -49,15 +49,11 @@ constexpr std::optional<Error> VerifyHttpVersion(const char major,
 }  // namespace detail
 
 Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
-  // HTTP-name "/"
-  // HTTP-name = %x48.54.54.50 ; "HTTP", case-sensitive
-  //
-  // > HTTP-version is case-sensitive.
-  // Reference: https://tools.ietf.org/html/rfc7230#section-2.6
-  //
   // > The expectation to support HTTP/0.9 requests has been removed.
   // Reference: https://tools.ietf.org/html/rfc7230#appendix-A.2
-  if (!parser.skip("HTTP/")) {
+
+  // HTTP-name "/"
+  if (!parser.skip(detail::syntax::kHttpName) || !parser.skip('/')) {
     return Unexpected{Error::Invalid_HTTP_Name};
   }
 
