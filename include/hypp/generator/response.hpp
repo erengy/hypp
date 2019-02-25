@@ -16,7 +16,7 @@ std::string to_string(const StatusLine& status_line) {
   return detail::concat(
       to_string(status_line.version), kSP,
       to_string(status_line.code), kSP,
-      status::GetPhrase(status_line.code), kCRLF);
+      status::to_phrase(status_line.code), kCRLF);
 }
 
 }  // namespace hypp
