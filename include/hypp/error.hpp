@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hypp/detail/expected.hpp>
+#include <hypp/status.hpp>
 
 namespace hypp {
 
@@ -11,13 +12,13 @@ namespace hypp {
 
 enum class Error {
   // HTTP status codes
-  Bad_Request,                      // 400
-  Payload_Too_Large,                // 413
-  URI_Too_Long,                     // 414
-  Upgrade_Required,                 // 426
-  Request_Header_Fields_Too_Large,  // 431
-  Not_Implemented,                  // 501
-  HTTP_Version_Not_Supported,       // 505
+  Bad_Request,
+  Payload_Too_Large,
+  URI_Too_Long,
+  Upgrade_Required,
+  Request_Header_Fields_Too_Large,
+  Not_Implemented,
+  HTTP_Version_Not_Supported,
 
   // Header
   Invalid_Header_Format,
@@ -51,5 +52,52 @@ using Unexpected = detail::Unexpected<Error>;
 
 template <typename T>
 using Expected = detail::Expected<T, Error>;
+
+constexpr const std::string_view to_string(const Error error) {
+  switch (error) {
+    case Error::Bad_Request:
+      return status::to_phrase(status::k400_Bad_Request);
+    case Error::Payload_Too_Large:
+      return status::to_phrase(status::k413_Payload_Too_Large);
+    case Error::URI_Too_Long:
+      return status::to_phrase(status::k414_URI_Too_Long);
+    case Error::Upgrade_Required:
+      return status::to_phrase(status::k426_Upgrade_Required);
+    case Error::Request_Header_Fields_Too_Large:
+      return status::to_phrase(status::k431_Request_Header_Fields_Too_Large);
+    case Error::Not_Implemented:
+      return status::to_phrase(status::k501_Not_Implemented);
+    case Error::HTTP_Version_Not_Supported:
+      return status::to_phrase(status::k505_HTTP_Version_Not_Supported);
+    case Error::Invalid_Header_Format:
+      return "Invalid Header Format";
+    case Error::Invalid_Header_Name:
+      return "Invalid Header Name";
+    case Error::Invalid_Method:
+      return "Invalid Method";
+    case Error::Invalid_Request_Target:
+      return "Invalid Request Target";
+    case Error::Bad_Response:
+      return "Bad Response";
+    case Error::Invalid_Status_Code:
+      return "Invalid Status Code";
+    case Error::Address_Mechanism_Not_Supported:
+      return "Address Mechanism Not Supported";
+    case Error::Invalid_URI:
+      return "Invalid URI";
+    case Error::Invalid_URI_Scheme:
+      return "Invalid URI Scheme";
+    case Error::Invalid_URI_Host:
+      return "Invalid URI Host";
+    case Error::Invalid_URI_Path:
+      return "Invalid URI Path";
+    case Error::Invalid_HTTP_Name:
+      return "Invalid HTTP Name";
+    case Error::Invalid_HTTP_Version:
+      return "Invalid HTTP Version";
+    default:
+      return "Unknown Error";
+  }
+}
 
 }  // namespace hypp
