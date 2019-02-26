@@ -63,7 +63,7 @@ std::string to_string(const RequestLine& request_line) {
   return detail::concat(
       request_line.method, kSP,
       to_string(request_line.target), kSP,
-      to_string(request_line.http_version), kCRLF);
+      to_string(request_line.version), kCRLF);
 }
 
 }  // namespace hypp

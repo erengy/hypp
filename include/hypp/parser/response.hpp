@@ -14,7 +14,7 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   StatusLine status_line;
 
   // HTTP-version SP
-  if (const auto expected = ParseHttpVersion(parser)) {
+  if (const auto expected = ParseVersion(parser)) {
     status_line.version = expected.value();
   } else {
     return Unexpected{expected.error()};

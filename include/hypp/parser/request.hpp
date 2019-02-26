@@ -85,8 +85,8 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   }
 
   // HTTP-version CRLF
-  if (const auto expected = ParseHttpVersion(parser)) {
-    request_line.http_version = expected.value();
+  if (const auto expected = ParseVersion(parser)) {
+    request_line.version = expected.value();
   } else {
     return Unexpected{expected.error()};
   }

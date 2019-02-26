@@ -11,8 +11,8 @@ namespace hypp {
 
 namespace detail {
 
-constexpr std::optional<Error> VerifyHttpVersion(const char major,
-                                                 const char minor) {
+constexpr std::optional<Error> VerifyVersion(const char major,
+                                             const char minor) {
   // HTTP/0.9 messages do not indicate the protocol version. Higher major
   // versions of the protocol (e.g. HTTP/2.0) would have an incompatible
   // messaging syntax.
@@ -48,7 +48,7 @@ constexpr std::optional<Error> VerifyHttpVersion(const char major,
 
 }  // namespace detail
 
-Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
+Expected<Version> ParseVersion(Parser& parser) {
   // > The expectation to support HTTP/0.9 requests has been removed.
   // Reference: https://tools.ietf.org/html/rfc7230#appendix-A.2
 
@@ -70,11 +70,11 @@ Expected<HttpVersion> ParseHttpVersion(Parser& parser) {
     return Unexpected{Error::Invalid_HTTP_Version};
   }
 
-  if (const auto error = detail::VerifyHttpVersion(major, minor)) {
+  if (const auto error = detail::VerifyVersion(major, minor)) {
     return Unexpected{*error};
   }
 
-  return HttpVersion{major, minor};
+  return Version{major, minor};
 }
 
 }  // namespace hypp

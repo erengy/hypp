@@ -2,7 +2,7 @@
 
 namespace hypp {
 
-struct HttpVersion {
+struct Version {
   char major = '\0';
   char minor = '\0';
 };

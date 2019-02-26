@@ -26,7 +26,7 @@ struct RequestTarget {
 struct RequestLine {
   std::string method;
   RequestTarget target;
-  HttpVersion http_version;
+  Version version;
 };
 
 using Request = Message<RequestLine>;
