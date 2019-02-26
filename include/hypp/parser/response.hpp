@@ -10,6 +10,7 @@
 
 namespace hypp {
 
+// status-line = HTTP-version SP status-code SP reason-phrase CRLF
 Expected<StatusLine> ParseStatusLine(Parser& parser) {
   StatusLine status_line;
 
@@ -46,7 +47,6 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
 }
 
 Expected<StatusLine> ParseStartLine(Parser& parser, const Response&) {
-  // status-line = HTTP-version SP status-code SP reason-phrase CRLF
   return ParseStatusLine(parser);
 }
 

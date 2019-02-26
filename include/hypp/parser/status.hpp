@@ -9,8 +9,8 @@
 
 namespace hypp {
 
+// status-code = 3DIGIT
 Expected<status::code_t> ParseStatusCode(Parser& parser) {
-  // status-code = 3DIGIT
   const auto view = parser.match(detail::limits::kStatusCode, detail::is_digit);
 
   if (view.size() != detail::limits::kStatusCode) {
@@ -20,8 +20,8 @@ Expected<status::code_t> ParseStatusCode(Parser& parser) {
   return detail::from_chars<status::code_t>(view);
 }
 
+// reason-phrase = *( HTAB / SP / VCHAR / obs-text )
 Expected<std::string_view> ParseReasonPhrase(Parser& parser) {
-  // reason-phrase = *( HTAB / SP / VCHAR / obs-text )
   return parser.match(detail::limits::kReasonPhrase,
       [](const char c) {
         switch (c) {

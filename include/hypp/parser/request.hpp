@@ -11,6 +11,10 @@
 
 namespace hypp {
 
+// request-target = origin-form
+//                / absolute-form
+//                / authority-form
+//                / asterisk-form
 Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   RequestTarget request_target;
 
@@ -55,6 +59,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   return Unexpected{Error::Invalid_Request_Target};
 }
 
+// request-line = method SP request-target SP HTTP-version CRLF
 Expected<RequestLine> ParseRequestLine(Parser& parser) {
   RequestLine request_line;
 
@@ -98,7 +103,6 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
 }
 
 Expected<RequestLine> ParseStartLine(Parser& parser, const Request&) {
-  // request-line = method SP request-target SP HTTP-version CRLF
   return ParseRequestLine(parser);
 }
 

@@ -21,34 +21,34 @@ constexpr auto kWhitespace = " \t";  // Whitespace (SP / HTAB)
 
 }  // namespace syntax
 
+// ALPHA = %x41-5A / %x61-7A  ; A-Z / a-z
 constexpr bool is_alpha(const char c) {
-  // ALPHA = %x41-5A / %x61-7A  ; A-Z / a-z
   return ('A' <= c && c <= 'Z') ||
          ('a' <= c && c <= 'z');
 }
 
+// DIGIT = %x30-39  ; 0-9
 constexpr bool is_digit(const char c) {
-  // DIGIT = %x30-39  ; 0-9
   return '0' <= c && c <= '9';
 }
 
+// HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
 constexpr bool is_hex_digit(const char c) {
-  // HEXDIG = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
   return ('0' <= c && c <= '9') ||
          ('A' <= c && c <= 'F') ||
          ('a' <= c && c <= 'f');
 }
 
+// obs-text = %x80-FF
 constexpr bool is_obs_text(const char c) {
-  // obs-text = %x80-FF
   return 0x80 <= c && c <= 0xFF;
 }
 
+// tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*"
+//       / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
+//       / DIGIT / ALPHA
+//       ; any VCHAR, except delimiters
 constexpr bool is_tchar(const char c) {
-  // tchar = "!" / "#" / "$" / "%" / "&" / "'" / "*"
-  //       / "+" / "-" / "." / "^" / "_" / "`" / "|" / "~"
-  //       / DIGIT / ALPHA
-  //       ; any VCHAR, except delimiters
   constexpr std::array<char, 256> tchar{
       0,    0,    0,    0,    0,    0,    0,    0,
       0,    0,    0,    0,    0,    0,    0,    0,
@@ -70,14 +70,14 @@ constexpr bool is_tchar(const char c) {
   return tchar[c];
 }
 
+// VCHAR = %x21-7E  ; visible (printing) characters
 constexpr bool is_vchar(const char c) {
-  // VCHAR = %x21-7E  ; visible (printing) characters
   return 0x21 <= c && c <= 0x7E;
 }
 
+// gen-delims = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+//            ; delimiters of the generic URI components
 constexpr bool is_gen_delim(const char c) {
-  // gen-delims = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-  //            ; delimiters of the generic URI components
   switch (c) {
     case ':': case '/': case '?': case '#': case '[': case ']': case '@':
       return true;
@@ -86,9 +86,9 @@ constexpr bool is_gen_delim(const char c) {
   }
 }
 
+// sub-delims = "!" / "$" / "&" / "'" / "(" / ")"
+//            / "*" / "+" / "," / ";" / "="
 constexpr bool is_sub_delim(const char c) {
-  // sub-delims = "!" / "$" / "&" / "'" / "(" / ")"
-  //            / "*" / "+" / "," / ";" / "="
   switch (c) {
     case '!': case '$': case '&': case '\'': case '(': case ')':
     case '*': case '+': case ',': case  ';': case '=':
@@ -98,13 +98,13 @@ constexpr bool is_sub_delim(const char c) {
   }
 }
 
+// reserved = gen-delims / sub-delims
 constexpr bool is_reserved(const char c) {
-  // reserved = gen-delims / sub-delims
   return is_gen_delim(c) || is_sub_delim(c);
 }
 
+// unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
 constexpr bool is_unreserved(const char c) {
-  // unreserved = ALPHA / DIGIT / "-" / "." / "_" / "~"
   switch (c) {
     default:
       return is_alpha(c) || is_digit(c);
@@ -113,12 +113,12 @@ constexpr bool is_unreserved(const char c) {
   }
 }
 
+// dec-octet = DIGIT              ; 0-9
+//           / %x31-39 DIGIT      ; 10-99
+//           / "1" 2DIGIT         ; 100-199
+//           / "2" %x30-34 DIGIT  ; 200-249
+//           / "25" %x30-35       ; 250-255
 size_t is_dec_octet(std::string_view view) {
-  // dec-octet = DIGIT              ; 0-9
-  //           / %x31-39 DIGIT      ; 10-99
-  //           / "1" 2DIGIT         ; 100-199
-  //           / "2" %x30-34 DIGIT  ; 200-249
-  //           / "25" %x30-35       ; 250-255
   view = view.substr(0, 3);
   const int value = from_chars<int>(view);
   const auto it = std::find_if_not(view.begin(), view.end(), is_digit);
@@ -130,14 +130,14 @@ size_t is_dec_octet(std::string_view view) {
   return 0;
 }
 
+// pct-encoded = "%" HEXDIG HEXDIG
 constexpr size_t is_pct_encoded(const std::string_view view) {
-  // pct-encoded = "%" HEXDIG HEXDIG
   return view.size() > 2 && view[0] == '%' &&
          is_hex_digit(view[1]) && is_hex_digit(view[2]) ? 3 : 0;
 }
 
+// pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
 constexpr size_t is_pchar(const std::string_view view) {
-  // pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
   constexpr auto p = [](const char c) {
     switch (c) {
       default:

@@ -9,8 +9,8 @@
 
 namespace hypp {
 
+// method = token
 Expected<std::string_view> ParseMethod(Parser& parser) {
-  // method = token
   const auto view = parser.match(detail::limits::kMethod, detail::is_tchar);
 
   if (view.empty()) {
