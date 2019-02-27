@@ -8,18 +8,20 @@
 
 namespace hypp {
 
+namespace detail {
+
 // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-Expected<std::string_view> ParseUriScheme(Parser& parser) {
-  if (!parser.peek(detail::is_alpha)) {
-    return Unexpected{Error::Invalid_URI_Scheme};
+hypp::Expected<std::string_view> ParseUriScheme(Parser& parser) {
+  if (!parser.peek(is_alpha)) {
+    return hypp::Unexpected{Error::Invalid_URI_Scheme};
   }
-  return parser.match(detail::limits::kScheme,
+  return parser.match(limits::kScheme,
       [](const char c) {
         switch (c) {
           case '+': case '-': case '.':
             return true;
           default:
-            return detail::is_alpha(c) || detail::is_digit(c);
+            return is_alpha(c) || is_digit(c);
         }
       });
 }
@@ -27,26 +29,26 @@ Expected<std::string_view> ParseUriScheme(Parser& parser) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
-Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
-  return parser.match(detail::limits::kURI,
+hypp::Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
+  return parser.match(limits::kURI,
       [](const char c) {
         switch (c) {
           case ':':
             return true;
           default:
-            return detail::is_unreserved(c) || detail::is_sub_delim(c);
+            return is_unreserved(c) || is_sub_delim(c);
         }
       },
       [](const std::string_view view) {
-        return detail::is_pct_encoded(view);
+        return is_pct_encoded(view);
       });
 }
 
 // IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
-Expected<std::string_view> ParseIpLiteral(Parser& parser) {
+hypp::Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   // "["
   if (!parser.skip('[')) {
-    return Unexpected{Error::Invalid_URI_Host};
+    return hypp::Unexpected{Error::Invalid_URI_Host};
   }
 
   // IPvFuture = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
@@ -58,7 +60,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   // not supported".
   // Reference: https://tools.ietf.org/html/rfc3986#section-3.2.2
   if (parser.peek('v') || parser.peek('V')) {
-    return Unexpected{Error::Address_Mechanism_Not_Supported};
+    return hypp::Unexpected{Error::Address_Mechanism_Not_Supported};
   }
 
   // IPv6address =                            6( h16 ":" ) ls32
@@ -76,7 +78,7 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   //
   // h16         = 1*4HEXDIG
   //             ; 16 bits of address represented in hexadecimal
-  const auto view = parser.match(detail::limits::kURI,
+  const auto view = parser.match(limits::kURI,
       [](const char c) {
         // @TODO: Parse properly
         switch (c) {
@@ -84,32 +86,32 @@ Expected<std::string_view> ParseIpLiteral(Parser& parser) {
           case '.':  // for IPv4address
             return true;
           default:
-            return detail::is_hex_digit(c);
+            return is_hex_digit(c);
         }
       });
   if (view.empty()) {
-    return Unexpected{Error::Invalid_URI_Host};
+    return hypp::Unexpected{Error::Invalid_URI_Host};
   }
 
   // "]"
   if (!parser.skip(']')) {
-    return Unexpected{Error::Invalid_URI_Host};
+    return hypp::Unexpected{Error::Invalid_URI_Host};
   }
 
   return view;
 }
 
 // IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
-Expected<std::string_view> ParseIpV4Address(Parser& parser) {
+hypp::Expected<std::string_view> ParseIpV4Address(Parser& parser) {
   Parser ip_parser{parser};
 
   for (int i = 0; i < 4; ++i) {
     if (i > 0 && !ip_parser.skip('.')) {
-      return Unexpected{Error::Invalid_URI_Host};
+      return hypp::Unexpected{Error::Invalid_URI_Host};
     }
-    const auto dec_octet = ip_parser.match(detail::is_dec_octet);
+    const auto dec_octet = ip_parser.match(is_dec_octet);
     if (dec_octet.empty()) {
-      return Unexpected{Error::Invalid_URI_Host};
+      return hypp::Unexpected{Error::Invalid_URI_Host};
     }
   }
 
@@ -117,18 +119,18 @@ Expected<std::string_view> ParseIpV4Address(Parser& parser) {
 }
 
 // reg-name = *( unreserved / pct-encoded / sub-delims )
-Expected<std::string_view> ParseRegisteredName(Parser& parser) {
-  return parser.match(detail::limits::kURI,
+hypp::Expected<std::string_view> ParseRegisteredName(Parser& parser) {
+  return parser.match(limits::kURI,
       [](const char c) {
-        return detail::is_unreserved(c) || detail::is_sub_delim(c);
+        return is_unreserved(c) || is_sub_delim(c);
       },
       [](const std::string_view view) {
-        return detail::is_pct_encoded(view);
+        return is_pct_encoded(view);
       });
 }
 
 // host = IP-literal / IPv4address / reg-name
-Expected<std::string_view> ParseUriHost(Parser& parser) {
+hypp::Expected<std::string_view> ParseUriHost(Parser& parser) {
   std::string_view view;
 
   // > The syntax rule for host is ambiguous because it does not completely
@@ -149,19 +151,19 @@ Expected<std::string_view> ParseUriHost(Parser& parser) {
   // A recipient that processes such a URI reference MUST reject it as invalid.
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
   if (view.empty()) {
-    return Unexpected{Error::Invalid_URI_Host};
+    return hypp::Unexpected{Error::Invalid_URI_Host};
   }
 
   return view;
 }
 
 // port = *DIGIT
-Expected<std::string_view> ParseUriPort(Parser& parser) {
-  return parser.match(detail::limits::kPort, detail::is_digit);
+hypp::Expected<std::string_view> ParseUriPort(Parser& parser) {
+  return parser.match(limits::kPort, is_digit);
 }
 
 // authority = [ userinfo "@" ] host [ ":" port ]
-Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
+hypp::Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
   Uri::Authority authority;
 
   // [ userinfo "@" ]
@@ -172,14 +174,14 @@ Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
       parser.remove(parser.size() - user_info_parser.size());
     }
   } else {
-    return Unexpected{expected.error()};
+    return hypp::Unexpected{expected.error()};
   }
 
   // host
   if (const auto expected = ParseUriHost(parser)) {
     authority.host = expected.value();
   } else {
-    return Unexpected{expected.error()};
+    return hypp::Unexpected{expected.error()};
   }
 
   // [ ":" port ]
@@ -187,7 +189,7 @@ Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
     if (const auto expected = ParseUriPort(parser)) {
       authority.port = expected.value();
     } else {
-      return Unexpected{expected.error()};
+      return hypp::Unexpected{expected.error()};
     }
   }
 
@@ -213,18 +215,18 @@ enum UriPathRules {
 //      / path-rootless  ; begins with a segment
 //      / path-empty     ; zero characters
 //      / absolute-path  ; begins with "/" (RFC 7230)
-Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
+hypp::Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // segment       = *pchar
   // segment-nz    = 1*pchar
   // segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
   //               ; non-zero-length segment without any colon ":"
   const auto parse_segment = [](Parser& parser) {
-    return parser.match(detail::limits::kURI, detail::is_pchar);
+    return parser.match(limits::kURI, is_pchar);
   };
   const auto parse_segment_nz_nc = [](Parser& parser) {
     Parser segment_parser{parser};
-    auto view = segment_parser.match(detail::limits::kURI,
-                                     detail::is_pchar);
+    auto view = segment_parser.match(limits::kURI,
+                                     is_pchar);
     if (const auto pos = view.find(':'); pos != view.npos) {
       view = view.substr(0, pos);
     }
@@ -234,12 +236,12 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     if (!parser.peek('/')) {
       return std::string_view{};
     }
-    return parser.match(detail::limits::kURI,
+    return parser.match(limits::kURI,
         [](const char c) {
           return c == '/';
         },
         [](const std::string_view view) {
-          return detail::is_pchar(view);
+          return is_pchar(view);
         });
   };
 
@@ -259,7 +261,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.7
   if (flags & kUriAbsolutePath) {
     if (!parser.peek('/')) {
-      return Unexpected{Error::Invalid_URI_Path};
+      return hypp::Unexpected{Error::Invalid_URI_Path};
     }
     return parse_slash_segment(parser);
   }
@@ -270,7 +272,7 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     Parser path_parser{parser};
     if (path_parser.skip('/')) {
       if (path_parser.peek('/')) {
-        return Unexpected{Error::Invalid_URI_Path};
+        return hypp::Unexpected{Error::Invalid_URI_Path};
       }
       const auto segment_nz = parse_segment(path_parser);
       if (!segment_nz.empty()) {
@@ -308,41 +310,41 @@ Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
     return std::string_view{};
   }
 
-  return Unexpected{Error::Invalid_URI_Path};
+  return hypp::Unexpected{Error::Invalid_URI_Path};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // query = *( pchar / "/" / "?" )
-Expected<std::string_view> ParseUriQuery(Parser& parser) {
-  return parser.match(detail::limits::kURI,
+hypp::Expected<std::string_view> ParseUriQuery(Parser& parser) {
+  return parser.match(limits::kURI,
       [](const char c) {
         return c == '/' || c == '?';
       },
       [](const std::string_view view) {
-        return detail::is_pchar(view);
+        return is_pchar(view);
       });
 }
 
 // fragment = *( pchar / "/" / "?" )
-Expected<std::string_view> ParseUriFragment(Parser& parser) {
+hypp::Expected<std::string_view> ParseUriFragment(Parser& parser) {
   return ParseUriQuery(parser);  // same ABNF rule
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // absolute-URI = scheme ":" hier-part [ "?" query ]
-Expected<Uri> ParseAbsoluteUri(Parser& parser) {
+hypp::Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   Uri uri;
 
   // scheme ":"
   if (const auto expected = ParseUriScheme(parser)) {
     uri.scheme = expected.value();
   } else {
-    return Unexpected{expected.error()};
+    return hypp::Unexpected{expected.error()};
   }
   if (!parser.skip(':')) {
-    return Unexpected{Error::Invalid_URI};
+    return hypp::Unexpected{Error::Invalid_URI};
   }
 
   // hier-part = "//" authority path-abempty
@@ -353,7 +355,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
     if (const auto expected = ParseUriAuthority(parser)) {
       uri.authority = expected.value();
     } else {
-      return Unexpected{expected.error()};
+      return hypp::Unexpected{expected.error()};
     }
   }
   const auto kPathRules = uri.authority ? kUriPathAbEmpty :
@@ -361,7 +363,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   if (const auto expected = ParseUriPath(parser, kPathRules)) {
     uri.path = expected.value();
   } else {
-    return Unexpected{expected.error()};
+    return hypp::Unexpected{expected.error()};
   }
 
   // [ "?" query ]
@@ -369,30 +371,7 @@ Expected<Uri> ParseAbsoluteUri(Parser& parser) {
     if (const auto expected = ParseUriQuery(parser)) {
       uri.query = expected.value();
     } else {
-      return Unexpected{expected.error()};
-    }
-  }
-
-  return uri;
-}
-
-// URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
-Expected<Uri> ParseUri(Parser& parser) {
-  Uri uri;
-
-  // Same components as absolute-URI
-  if (const auto expected = ParseAbsoluteUri(parser)) {
-    uri = expected.value();
-  } else {
-    return Unexpected{expected.error()};
-  }
-
-  // [ "#" fragment ]
-  if (parser.skip('#')) {
-    if (const auto expected = ParseUriFragment(parser)) {
-      uri.fragment = expected.value();
-    } else {
-      return Unexpected{expected.error()};
+      return hypp::Unexpected{expected.error()};
     }
   }
 
@@ -400,7 +379,7 @@ Expected<Uri> ParseUri(Parser& parser) {
 }
 
 // partial-URI = relative-part [ "?" query ]
-Expected<Uri> ParsePartialUri(Parser& parser) {
+hypp::Expected<Uri> ParsePartialUri(Parser& parser) {
   Uri uri;
 
   // relative-part = "//" authority path-abempty
@@ -411,7 +390,7 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
     if (const auto expected = ParseUriAuthority(parser)) {
       uri.authority = expected.value();
     } else {
-      return Unexpected{expected.error()};
+      return hypp::Unexpected{expected.error()};
     }
   }
   const auto kPathRules = uri.authority ? kUriPathAbEmpty :
@@ -419,7 +398,7 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
   if (const auto expected = ParseUriPath(parser, kPathRules)) {
     uri.path = expected.value();
   } else {
-    return Unexpected{expected.error()};
+    return hypp::Unexpected{expected.error()};
   }
 
   // [ "?" query ]
@@ -427,7 +406,7 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
     if (const auto expected = ParseUriQuery(parser)) {
       uri.query = expected.value();
     } else {
-      return Unexpected{expected.error()};
+      return hypp::Unexpected{expected.error()};
     }
   }
 
@@ -435,11 +414,36 @@ Expected<Uri> ParsePartialUri(Parser& parser) {
 }
 
 // relative-ref = relative-part [ "?" query ] [ "#" fragment ]
-Expected<Uri> ParseRelativeReference(Parser& parser) {
+hypp::Expected<Uri> ParseRelativeReference(Parser& parser) {
   Uri uri;
 
   // Same components as partial-URI
   if (const auto expected = ParsePartialUri(parser)) {
+    uri = expected.value();
+  } else {
+    return hypp::Unexpected{expected.error()};
+  }
+
+  // [ "#" fragment ]
+  if (parser.skip('#')) {
+    if (const auto expected = ParseUriFragment(parser)) {
+      uri.fragment = expected.value();
+    } else {
+      return hypp::Unexpected{expected.error()};
+    }
+  }
+
+  return uri;
+}
+
+}  // namespace detail
+
+// URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+Expected<Uri> ParseUri(Parser& parser) {
+  Uri uri;
+
+  // Same components as absolute-URI
+  if (const auto expected = detail::ParseAbsoluteUri(parser)) {
     uri = expected.value();
   } else {
     return Unexpected{expected.error()};
@@ -447,7 +451,7 @@ Expected<Uri> ParseRelativeReference(Parser& parser) {
 
   // [ "#" fragment ]
   if (parser.skip('#')) {
-    if (const auto expected = ParseUriFragment(parser)) {
+    if (const auto expected = detail::ParseUriFragment(parser)) {
       uri.fragment = expected.value();
     } else {
       return Unexpected{expected.error()};
@@ -467,7 +471,7 @@ Expected<Uri> ParseUriReference(Parser& parser) {
   // Reference: https://tools.ietf.org/html/rfc3986#section-4.1
   if (auto expected = ParseUri(parser)) {
     uri = expected.value();
-  } else if (expected = ParseRelativeReference(parser)) {
+  } else if (expected = detail::ParseRelativeReference(parser)) {
     uri = expected.value();
   } else {
     return Unexpected{expected.error()};

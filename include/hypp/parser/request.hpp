@@ -21,13 +21,13 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   // origin-form = absolute-path [ "?" query ]
   if (parser.peek('/')) {
     request_target.form = RequestTarget::Form::Origin;
-    if (const auto expected = ParseUriPath(parser, kUriAbsolutePath)) {
+    if (const auto expected = detail::ParseUriPath(parser, detail::kUriAbsolutePath)) {
       request_target.uri.path = expected.value();
     } else {
       return Unexpected{Error::Invalid_Request_Target};
     }
     if (parser.skip('?')) {
-      if (const auto expected = ParseUriQuery(parser)) {
+      if (const auto expected = detail::ParseUriQuery(parser)) {
         request_target.uri.query = expected.value();
       } else {
         return Unexpected{Error::Invalid_Request_Target};
@@ -37,7 +37,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   }
 
   // absolute-form = absolute-URI
-  if (const auto expected = ParseAbsoluteUri(parser)) {
+  if (const auto expected = detail::ParseAbsoluteUri(parser)) {
     request_target.form = RequestTarget::Form::Absolute;
     request_target.uri = expected.value();
     return request_target;
@@ -50,7 +50,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   }
 
   // authority-form = authority
-  if (const auto expected = ParseUriAuthority(parser)) {
+  if (const auto expected = detail::ParseUriAuthority(parser)) {
     request_target.form = RequestTarget::Form::Authority;
     request_target.uri.authority = expected.value();
     return request_target;
