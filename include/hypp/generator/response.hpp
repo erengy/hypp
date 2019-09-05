@@ -4,6 +4,7 @@
 
 #include <hypp/detail/syntax.hpp>
 #include <hypp/detail/util.hpp>
+#include <hypp/generator/message.hpp>
 #include <hypp/generator/status.hpp>
 #include <hypp/generator/version.hpp>
 #include <hypp/response.hpp>
@@ -17,6 +18,10 @@ inline std::string to_string(const StatusLine& status_line) {
       to_string(status_line.version), kSP,
       to_string(status_line.code), kSP,
       status::to_phrase(status_line.code), kCRLF);
+}
+
+inline std::string to_string(const Response& response) {
+  return to_string<StatusLine>(response);
 }
 
 }  // namespace hypp

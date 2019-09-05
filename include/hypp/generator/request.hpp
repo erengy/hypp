@@ -4,6 +4,7 @@
 
 #include <hypp/detail/util.hpp>
 #include <hypp/detail/syntax.hpp>
+#include <hypp/generator/message.hpp>
 #include <hypp/generator/uri.hpp>
 #include <hypp/generator/version.hpp>
 #include <hypp/request.hpp>
@@ -64,6 +65,10 @@ inline std::string to_string(const RequestLine& request_line) {
       request_line.method, kSP,
       to_string(request_line.target), kSP,
       to_string(request_line.version), kCRLF);
+}
+
+inline std::string to_string(const Request& request) {
+  return to_string<RequestLine>(request);
 }
 
 }  // namespace hypp
