@@ -56,7 +56,7 @@ int main() {
 
   const auto& r = expected.value();
   std::cout << r.start_line.code << '\n';             // 200
-  std::cout << r.header.fields.back().value << '\n';  // text/plain
+  std::cout << r.header_fields.back().value << '\n';  // text/plain
   std::cout << r.body.substr(0, 12) << '\n';          // Hello World!
 
   return 0;
