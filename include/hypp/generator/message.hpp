@@ -15,7 +15,7 @@ std::string to_string(const Message<StartLine>& message) {
   using namespace detail::syntax;
   return detail::concat(
       to_string(message.start_line),
-      to_string(message.header),
+      to_string(message.header_fields),
       kCRLF,
       message.body);
 }

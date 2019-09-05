@@ -5,13 +5,11 @@
 
 namespace hypp {
 
-struct Header {
-  struct Field {
-    std::string name;
-    std::string value;
-  };
-
-  std::vector<Field> fields;
+struct HeaderField {
+  std::string name;
+  std::string value;
 };
+
+using HeaderFields = std::vector<HeaderField>;
 
 }  // namespace hypp

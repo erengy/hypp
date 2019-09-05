@@ -9,7 +9,7 @@ namespace hypp {
 template <typename StartLine>
 struct Message {
   StartLine start_line;  // start-line = request-line / status-line
-  Header header;
+  HeaderFields header_fields;
   std::string body;
 };
 

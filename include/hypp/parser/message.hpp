@@ -44,7 +44,7 @@ Expected<MessageT> ParseMessage(const std::string_view view) {
 
   // *( header-field CRLF ) CRLF
   if (const auto expected = ParseHeaderFields(parser)) {
-    message.header = expected.value();
+    message.header_fields = expected.value();
   } else {
     return Unexpected{expected.error()};
   }

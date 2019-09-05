@@ -40,8 +40,8 @@ Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
 }
 
 // header-field = field-name ":" OWS field-value OWS
-Expected<Header::Field> ParseHeaderField(Parser& parser) {
-  Header::Field header_field;
+Expected<HeaderField> ParseHeaderField(Parser& parser) {
+  HeaderField header_field;
 
   // field-name
   if (const auto expected = ParseHeaderFieldName(parser)) {
@@ -75,8 +75,8 @@ Expected<Header::Field> ParseHeaderField(Parser& parser) {
 }
 
 // *( header-field CRLF )
-Expected<Header> ParseHeaderFields(Parser& parser) {
-  Header header;
+Expected<HeaderFields> ParseHeaderFields(Parser& parser) {
+  HeaderFields header_fields;
 
   const auto initial_size = parser.size();
 
@@ -91,7 +91,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
 
     // *( header-field CRLF )
     if (const auto expected = ParseHeaderField(parser)) {
-      header.fields.push_back(std::move(expected.value()));
+      header_fields.push_back(std::move(expected.value()));
     } else {
       return Unexpected{expected.error()};
     }
@@ -100,7 +100,7 @@ Expected<Header> ParseHeaderFields(Parser& parser) {
     }
   }
 
-  return header;
+  return header_fields;
 }
 
 }  // namespace hypp
