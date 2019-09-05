@@ -5,8 +5,8 @@
 
 namespace hypp::detail {
 
-// A naive implementation of the std::expected proposal
-// Reference: https://wg21.link/P0323r6
+// A basic implementation of the std::expected proposal
+// Reference: https://wg21.link/p0323
 
 template <typename E>
 class Unexpected {
@@ -68,11 +68,11 @@ public:
     return std::get<unexpected_t>(value_).value();
   }
 
-  constexpr operator value_t() const {
-    return std::get<value_t>(value_);
-  }
   constexpr const value_t& value() const {
     return std::get<value_t>(value_);
+  }
+  constexpr value_t&& value() {
+    return std::move(std::get<value_t>(value_));
   }
 
 private:
