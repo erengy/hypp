@@ -9,7 +9,7 @@ namespace hypp {
 
 namespace detail {
 
-bool VerifyUriAuthority(const Uri::Authority& authority) {
+inline bool VerifyUriAuthority(const Uri::Authority& authority) {
   // > A sender MUST NOT generate an "http" URI with an empty host identifier.
   // Reference: https://tools.ietf.org/html/rfc7230#section-2.7.1
   if (authority.host.empty()) {
@@ -19,7 +19,7 @@ bool VerifyUriAuthority(const Uri::Authority& authority) {
   return true;
 }
 
-bool VerifyUri(const Uri& uri) {
+inline bool VerifyUri(const Uri& uri) {
   // "http" scheme considers a missing authority or empty host invalid.
   // Reference: https://tools.ietf.org/html/rfc3986#section-3.2.2
   //
@@ -51,7 +51,7 @@ bool VerifyUri(const Uri& uri) {
 }  // namespace detail
 
 // authority = [ userinfo "@" ] host [ ":" port ]
-std::string to_string(const Uri::Authority& authority) {
+inline std::string to_string(const Uri::Authority& authority) {
   if (!detail::VerifyUriAuthority(authority)) {
     return {};
   }
@@ -76,7 +76,7 @@ std::string to_string(const Uri::Authority& authority) {
 
 // http-URI = "http:" "//" authority path-abempty [ "?" query ]
 //            [ "#" fragment ]
-std::string to_string(const Uri& uri) {
+inline std::string to_string(const Uri& uri) {
   if (!detail::VerifyUri(uri)) {
     return {};
   }

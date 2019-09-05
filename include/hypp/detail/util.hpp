@@ -7,7 +7,7 @@
 
 namespace hypp::detail {
 
-std::string operator+(std::string lhs, const std::string_view& rhs) {
+inline std::string operator+(std::string lhs, const std::string_view& rhs) {
   return lhs.append(rhs);
 }
 template <typename... Ts>

@@ -11,7 +11,7 @@ namespace hypp {
 namespace detail {
 
 // scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
-hypp::Expected<std::string_view> ParseUriScheme(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriScheme(Parser& parser) {
   if (!parser.peek(is_alpha)) {
     return hypp::Unexpected{Error::Invalid_URI_Scheme};
   }
@@ -29,7 +29,7 @@ hypp::Expected<std::string_view> ParseUriScheme(Parser& parser) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // userinfo = *( unreserved / pct-encoded / sub-delims / ":" )
-hypp::Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
   return parser.match(limits::kURI,
       [](const char c) {
         switch (c) {
@@ -45,7 +45,7 @@ hypp::Expected<std::string_view> ParseUriUserInfo(Parser& parser) {
 }
 
 // IP-literal = "[" ( IPv6address / IPvFuture  ) "]"
-hypp::Expected<std::string_view> ParseIpLiteral(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseIpLiteral(Parser& parser) {
   // "["
   if (!parser.skip('[')) {
     return hypp::Unexpected{Error::Invalid_URI_Host};
@@ -102,7 +102,7 @@ hypp::Expected<std::string_view> ParseIpLiteral(Parser& parser) {
 }
 
 // IPv4address = dec-octet "." dec-octet "." dec-octet "." dec-octet
-hypp::Expected<std::string_view> ParseIpV4Address(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseIpV4Address(Parser& parser) {
   Parser ip_parser{parser};
 
   for (int i = 0; i < 4; ++i) {
@@ -119,7 +119,7 @@ hypp::Expected<std::string_view> ParseIpV4Address(Parser& parser) {
 }
 
 // reg-name = *( unreserved / pct-encoded / sub-delims )
-hypp::Expected<std::string_view> ParseRegisteredName(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseRegisteredName(Parser& parser) {
   return parser.match(limits::kURI,
       [](const char c) {
         return is_unreserved(c) || is_sub_delim(c);
@@ -130,7 +130,7 @@ hypp::Expected<std::string_view> ParseRegisteredName(Parser& parser) {
 }
 
 // host = IP-literal / IPv4address / reg-name
-hypp::Expected<std::string_view> ParseUriHost(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriHost(Parser& parser) {
   std::string_view view;
 
   // > The syntax rule for host is ambiguous because it does not completely
@@ -158,12 +158,12 @@ hypp::Expected<std::string_view> ParseUriHost(Parser& parser) {
 }
 
 // port = *DIGIT
-hypp::Expected<std::string_view> ParseUriPort(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriPort(Parser& parser) {
   return parser.match(limits::kPort, is_digit);
 }
 
 // authority = [ userinfo "@" ] host [ ":" port ]
-hypp::Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
+inline hypp::Expected<Uri::Authority> ParseUriAuthority(Parser& parser) {
   Uri::Authority authority;
 
   // [ userinfo "@" ]
@@ -215,7 +215,8 @@ enum UriPathRules {
 //      / path-rootless  ; begins with a segment
 //      / path-empty     ; zero characters
 //      / absolute-path  ; begins with "/" (RFC 7230)
-hypp::Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
+inline hypp::Expected<std::string_view> ParseUriPath(Parser& parser,
+                                                     const int flags) {
   // segment       = *pchar
   // segment-nz    = 1*pchar
   // segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
@@ -316,7 +317,7 @@ hypp::Expected<std::string_view> ParseUriPath(Parser& parser, const int flags) {
 ////////////////////////////////////////////////////////////////////////////////
 
 // query = *( pchar / "/" / "?" )
-hypp::Expected<std::string_view> ParseUriQuery(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriQuery(Parser& parser) {
   return parser.match(limits::kURI,
       [](const char c) {
         return c == '/' || c == '?';
@@ -327,14 +328,14 @@ hypp::Expected<std::string_view> ParseUriQuery(Parser& parser) {
 }
 
 // fragment = *( pchar / "/" / "?" )
-hypp::Expected<std::string_view> ParseUriFragment(Parser& parser) {
+inline hypp::Expected<std::string_view> ParseUriFragment(Parser& parser) {
   return ParseUriQuery(parser);  // same ABNF rule
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // absolute-URI = scheme ":" hier-part [ "?" query ]
-hypp::Expected<Uri> ParseAbsoluteUri(Parser& parser) {
+inline hypp::Expected<Uri> ParseAbsoluteUri(Parser& parser) {
   Uri uri;
 
   // scheme ":"
@@ -379,7 +380,7 @@ hypp::Expected<Uri> ParseAbsoluteUri(Parser& parser) {
 }
 
 // partial-URI = relative-part [ "?" query ]
-hypp::Expected<Uri> ParsePartialUri(Parser& parser) {
+inline hypp::Expected<Uri> ParsePartialUri(Parser& parser) {
   Uri uri;
 
   // relative-part = "//" authority path-abempty
@@ -414,7 +415,7 @@ hypp::Expected<Uri> ParsePartialUri(Parser& parser) {
 }
 
 // relative-ref = relative-part [ "?" query ] [ "#" fragment ]
-hypp::Expected<Uri> ParseRelativeReference(Parser& parser) {
+inline hypp::Expected<Uri> ParseRelativeReference(Parser& parser) {
   Uri uri;
 
   // Same components as partial-URI
@@ -439,7 +440,7 @@ hypp::Expected<Uri> ParseRelativeReference(Parser& parser) {
 }  // namespace detail
 
 // URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
-Expected<Uri> ParseUri(Parser& parser) {
+inline Expected<Uri> ParseUri(Parser& parser) {
   Uri uri;
 
   // Same components as absolute-URI
@@ -462,7 +463,7 @@ Expected<Uri> ParseUri(Parser& parser) {
 }
 
 // URI-reference = URI / relative-ref
-Expected<Uri> ParseUriReference(Parser& parser) {
+inline Expected<Uri> ParseUriReference(Parser& parser) {
   Uri uri;
 
   // > If the URI-reference's prefix does not match the syntax of a scheme

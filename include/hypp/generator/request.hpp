@@ -14,7 +14,7 @@ namespace hypp {
 //                / absolute-form
 //                / authority-form
 //                / asterisk-form
-std::string to_string(RequestTarget target) {
+inline std::string to_string(RequestTarget target) {
   // > A sender MUST NOT generate the userinfo subcomponent (and its "@"
   // delimiter) when an "http" URI reference is generated within a message
   // as a request target or header field value.
@@ -58,7 +58,7 @@ std::string to_string(RequestTarget target) {
 }
 
 // request-line = method SP request-target SP HTTP-version CRLF
-std::string to_string(const RequestLine& request_line) {
+inline std::string to_string(const RequestLine& request_line) {
   using namespace detail::syntax;
   return detail::concat(
       request_line.method, kSP,

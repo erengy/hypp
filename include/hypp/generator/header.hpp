@@ -9,7 +9,7 @@
 namespace hypp {
 
 // header-field = field-name ":" OWS field-value OWS
-std::string to_string(const HeaderField& header_field) {
+inline std::string to_string(const HeaderField& header_field) {
   using namespace detail::syntax;
   // > For protocol elements where optional whitespace is preferred to
   // improve readability, a sender SHOULD generate the optional whitespace
@@ -19,7 +19,7 @@ std::string to_string(const HeaderField& header_field) {
 }
 
 // *( header-field CRLF )
-std::string to_string(const HeaderFields& header_fields) {
+inline std::string to_string(const HeaderFields& header_fields) {
   using namespace detail::syntax;
   std::string output;
   for (const auto& header_field : header_fields) {

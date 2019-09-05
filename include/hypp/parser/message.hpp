@@ -12,7 +12,7 @@
 namespace hypp {
 
 // message-body = *OCTET
-Expected<std::string_view> ParseMessageBody(Parser& parser) {
+inline Expected<std::string_view> ParseMessageBody(Parser& parser) {
   if (parser.size() > detail::limits::kBody) {
     return Unexpected{Error::Payload_Too_Large};
   }
@@ -22,7 +22,7 @@ Expected<std::string_view> ParseMessageBody(Parser& parser) {
 
 // HTTP-message = start-line *( header-field CRLF ) CRLF [ message-body ]
 template <typename MessageT>
-Expected<MessageT> ParseMessage(const std::string_view view) {
+inline Expected<MessageT> ParseMessage(const std::string_view view) {
   MessageT message;
 
   Parser parser{view};

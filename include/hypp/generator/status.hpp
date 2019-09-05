@@ -9,7 +9,7 @@
 namespace hypp {
 
 // status-code = 3DIGIT
-std::string to_string(const status::code_t& code) {
+inline std::string to_string(const status::code_t& code) {
   return detail::to_chars(code).substr(0, detail::limits::kStatusCode);
 }
 

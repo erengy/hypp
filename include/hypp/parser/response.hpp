@@ -11,7 +11,7 @@
 namespace hypp {
 
 // status-line = HTTP-version SP status-code SP reason-phrase CRLF
-Expected<StatusLine> ParseStatusLine(Parser& parser) {
+inline Expected<StatusLine> ParseStatusLine(Parser& parser) {
   StatusLine status_line;
 
   // HTTP-version SP
@@ -46,11 +46,11 @@ Expected<StatusLine> ParseStatusLine(Parser& parser) {
   return status_line;
 }
 
-Expected<StatusLine> ParseStartLine(Parser& parser, const Response&) {
+inline Expected<StatusLine> ParseStartLine(Parser& parser, const Response&) {
   return ParseStatusLine(parser);
 }
 
-Expected<Response> ParseResponse(const std::string_view view) {
+inline Expected<Response> ParseResponse(const std::string_view view) {
   return ParseMessage<Response>(view);
 }
 

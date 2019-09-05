@@ -49,7 +49,7 @@ constexpr std::optional<Error> VerifyVersion(const char major,
 }  // namespace detail
 
 // HTTP-version = HTTP-name "/" DIGIT "." DIGIT
-Expected<Version> ParseVersion(Parser& parser) {
+constexpr Expected<Version> ParseVersion(Parser& parser) {
   // > The expectation to support HTTP/0.9 requests has been removed.
   // Reference: https://tools.ietf.org/html/rfc7230#appendix-A.2
 

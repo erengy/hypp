@@ -9,7 +9,7 @@
 namespace hypp {
 
 // field-name = token
-Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
+inline Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
   const auto name = parser.match(detail::limits::kFieldName, detail::is_tchar);
   if (name.empty()) {
     return Unexpected{Error::Invalid_Header_Name};
@@ -18,7 +18,7 @@ Expected<std::string_view> ParseHeaderFieldName(Parser& parser) {
 }
 
 // field-value = *( field-content / obs-fold )
-Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
+inline Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
   // field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
   // field-vchar   = VCHAR / obs-text
   //
@@ -40,7 +40,7 @@ Expected<std::string_view> ParseHeaderFieldValue(Parser& parser) {
 }
 
 // header-field = field-name ":" OWS field-value OWS
-Expected<HeaderField> ParseHeaderField(Parser& parser) {
+inline Expected<HeaderField> ParseHeaderField(Parser& parser) {
   HeaderField header_field;
 
   // field-name
@@ -75,7 +75,7 @@ Expected<HeaderField> ParseHeaderField(Parser& parser) {
 }
 
 // *( header-field CRLF )
-Expected<HeaderFields> ParseHeaderFields(Parser& parser) {
+inline Expected<HeaderFields> ParseHeaderFields(Parser& parser) {
   HeaderFields header_fields;
 
   const auto initial_size = parser.size();

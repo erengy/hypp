@@ -118,7 +118,7 @@ constexpr bool is_unreserved(const char c) {
 //           / "1" 2DIGIT         ; 100-199
 //           / "2" %x30-34 DIGIT  ; 200-249
 //           / "25" %x30-35       ; 250-255
-size_t is_dec_octet(std::string_view view) {
+inline size_t is_dec_octet(std::string_view view) {
   view = view.substr(0, 3);
   const int value = from_chars<int>(view);
   const auto it = std::find_if_not(view.begin(), view.end(), is_digit);

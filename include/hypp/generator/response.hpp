@@ -11,7 +11,7 @@
 namespace hypp {
 
 // status-line = HTTP-version SP status-code SP reason-phrase CRLF
-std::string to_string(const StatusLine& status_line) {
+inline std::string to_string(const StatusLine& status_line) {
   using namespace detail::syntax;
   return detail::concat(
       to_string(status_line.version), kSP,

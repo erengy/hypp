@@ -15,7 +15,7 @@ namespace hypp {
 //                / absolute-form
 //                / authority-form
 //                / asterisk-form
-Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
+inline Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
   RequestTarget request_target;
 
   // origin-form = absolute-path [ "?" query ]
@@ -60,7 +60,7 @@ Expected<RequestTarget> ParseRequestTarget(Parser& parser) {
 }
 
 // request-line = method SP request-target SP HTTP-version CRLF
-Expected<RequestLine> ParseRequestLine(Parser& parser) {
+inline Expected<RequestLine> ParseRequestLine(Parser& parser) {
   RequestLine request_line;
 
   // > In the interest of robustness, a server that is expecting to receive
@@ -102,11 +102,11 @@ Expected<RequestLine> ParseRequestLine(Parser& parser) {
   return request_line;
 }
 
-Expected<RequestLine> ParseStartLine(Parser& parser, const Request&) {
+inline Expected<RequestLine> ParseStartLine(Parser& parser, const Request&) {
   return ParseRequestLine(parser);
 }
 
-Expected<Request> ParseRequest(const std::string_view view) {
+inline Expected<Request> ParseRequest(const std::string_view view) {
   return ParseMessage<Request>(view);
 }
 
