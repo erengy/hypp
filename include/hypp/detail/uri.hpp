@@ -5,7 +5,7 @@
 
 namespace hypp::detail::uri {
 
-std::string decode(const std::string_view str) {
+inline std::string decode(const std::string_view str) {
   std::string output;
 
   constexpr auto digits = "0123456789ABCDEF";
@@ -38,7 +38,7 @@ std::string decode(const std::string_view str) {
   return output;
 }
 
-std::string encode(const std::string_view str) {
+inline std::string encode(const std::string_view str) {
   std::string output;
 
   constexpr auto digits = "0123456789ABCDEF";
