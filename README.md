@@ -2,7 +2,7 @@
 
 hypp is a client-oriented HTTP library for C++. It can parse and generate HTTP/1.1 messages and URIs.
 
-To send or receive HTTP messages, you must use hypp along with another library.
+To send or receive HTTP messages, you must use hypp along with another library such as [hypr](https://github.com/erengy/hypr).
 
 ## Conformance
 
