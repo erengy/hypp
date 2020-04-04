@@ -33,21 +33,22 @@ hypp treats unsupported HTTP versions as errors, and does not attempt to recover
 #include <hypp.hpp>
 
 int main() {
+  // Example response from RFC 7230 Section 2.1
+  constexpr auto example =
+      "HTTP/1.1 200 OK\r\n"
+      "Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n"
+      "Server: Apache\r\n"
+      "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\r\n"
+      "ETag: \"34aa387-d-1568eb00\"\r\n"
+      "Accept-Ranges: bytes\r\n"
+      "Content-Length: 51\r\n"
+      "Vary: Accept-Encoding\r\n"
+      "Content-Type: text/plain\r\n"
+      "\r\n"
+      "Hello World! My payload includes a trailing CRLF.\r\n";
+
   // Returns hypp::Expected<hypp::Response>
-  const auto expected = hypp::ParseResponse(
-        // Example response from RFC 7230 Section 2.1
-        "HTTP/1.1 200 OK\r\n"
-        "Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n"
-        "Server: Apache\r\n"
-        "Last-Modified: Wed, 22 Jul 2009 19:15:56 GMT\r\n"
-        "ETag: \"34aa387-d-1568eb00\"\r\n"
-        "Accept-Ranges: bytes\r\n"
-        "Content-Length: 51\r\n"
-        "Vary: Accept-Encoding\r\n"
-        "Content-Type: text/plain\r\n"
-        "\r\n"
-        "Hello World! My payload includes a trailing CRLF.\r\n"
-      );
+  const auto expected = hypp::ParseResponse(example);
 
   if (!expected) {
     std::cout << "Error: " << hypp::to_string(expected.error()) << '\n';
