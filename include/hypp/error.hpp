@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <hypp/detail/expected.hpp>
 #include <hypp/status.hpp>
 
@@ -53,7 +55,7 @@ using Unexpected = detail::Unexpected<Error>;
 template <typename T>
 using Expected = detail::Expected<T, Error>;
 
-constexpr const std::string_view to_string(const Error error) {
+inline std::string to_string(const Error error) {
   switch (error) {
     case Error::Bad_Request:
       return status::to_phrase(status::k400_Bad_Request);
