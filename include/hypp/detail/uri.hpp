@@ -14,7 +14,7 @@ inline std::string decode(const std::string_view str) {
            ('A' <= c && c <= 'F') ||
            ('a' <= c && c <= 'f');
   };
-  constexpr auto is_encoded = [&](const size_t i) {
+  const auto is_encoded = [&](const size_t i) {
     return str[i] == '%' &&
            i + 2 < str.size() &&
            is_xdigit(str[i + 1]) &&
